@@ -26,6 +26,7 @@ public class Merchant {
     private String city;
     private String name;
     private String state;
+    private String phone;
 
     public String getAgent() {
         return agent;
@@ -57,6 +58,10 @@ public class Merchant {
 
     public String getName() {
         return name;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public String getState() {
@@ -109,6 +114,10 @@ public class Merchant {
 
     public void setName(String merchantName) {
         this.name = merchantName;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public void setState(String merchantState) {
