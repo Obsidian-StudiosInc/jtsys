@@ -10,14 +10,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Map.Entry;
-import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -32,20 +30,36 @@ public class Tsys {
     private final char STX = 0x02;//0b1100100
     private final char ETX = 0x03;//0b0000011
     private final char FS  = 0x1c;//0b0011100
+    private final char GS  = 0x1d;//0b
     private final char ETB = 0x17;//0b0010111
 
     // A/N Device Codes
-    private final char[] DEVICE_CODES = { 'Q',              // Q="Third party software developer" (4.62)
-                                          'C',              // C="P.C." (4.62)
-                                          'M'};             // M="Main Frame" (4.62)
-    private final short[] COUNTRY_CODES = { 840 };          // 840=US
-    private final short[] CURRENCY_CODES = { 840 };         // 840=USD
-    private final short[] TIME_ZONES = { 705 };             // 705=EST
+    private final char[] DEVICE_CODES = {                   // Device Code (4.62)
+        '0',                                                // 0="Unkown or Unsure"
+        'C',                                                // C="P.C." 
+        'D',                                                // D="Dial Terminal"
+        'E',                                                // E="Electronic Cash Register"
+        'I',                                                // I="In-Store Processor"
+        'M',                                                // M="Main Frame"
+        'P',                                                // P="Reserved POS-Port®"
+        'Q',                                                // Q="Reserved Third party software developer"
+        'R',                                                // R="POS-Port®"
+        'S',                                                // S="POS Partner®"
+        'Z'                                                 // Z="Suppress PS2000/Merit response fields"
+    };
+    private final short[] COUNTRY_CODES = { 840 };   // 840=US
+    private final short[] CURRENCY_CODES = { 840 };  // 840=USD
+    private final short[] TIME_ZONES = {
+        705,                                                // 705=EST
+        706,                                                // 706=CST
+        707,                                                // 707=MST
+        708,                                                // 708=PST
+    };
     private final String[] MIME = {
         "x-Visa-II/x-auth",                                 // Auth mime
         "x-Visa-II/x-settle"                                // Settle mime
-    };   
-    private final String[] LANGUAGES = { "00" };            // 00=English
+    };
+    private final String[] LANGUAGES = { "00" };      // 00=English
  
     private final String[] ERROR_TYPES= {
         "B","Blocked Terminal",
@@ -57,22 +71,20 @@ public class Tsys {
         "U","Unknown Error",
         "V","Routing Error"
     };
-
-
-    public static byte[] getAsciiBytes(String input) {
-        char[] c = input.toCharArray();
-        byte[] b = new byte[c.length];
-        for (int i = 0; i < c.length; i++)
-            b[i] = (byte)(c[i] & 0x7F);
-        return b;
-    }
-
-    public Tsys() {
-        
-    }
+    private final String[] ERROR_RECORD_TYPES= {
+        "H","Header Record",
+        "P","Parameter Record",
+        "D","Detail Record",
+        "T","Trailer Record"
+    };
 
     public static void main(String[] args) {
+//        System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_CBC_SHA256");
         Tsys tsys = new Tsys();
+        tsys.submit("Auth",testMerchant());
+    }
+
+    private static Merchant testMerchant() {
         Merchant m = new Merchant();
         m.setId("999999999911");
         m.setBin("999995");
@@ -86,10 +98,11 @@ public class Tsys {
         m.setCity("Gloucester");
         m.setState("VA");
         m.setZip("543211420");
+        m.setPhone("800-1234567");
         m.setV("00000001");
-        tsys.submit("Auth",m);
+        return(m);
     }
-    
+
     private String seperator(String obj,
                              String s,
                              int length,
@@ -99,7 +112,7 @@ public class Tsys {
         return (STX+s+etbx+lrc(s+etbx));
     }
 
-    private String test() throws Exception {
+    private String testRequest() throws Exception {
         String t = "D4.999995";   // D2. DO
         StringBuilder msg = new StringBuilder(); 
         msg.append(seperator("test",t,t.length(),ETX));
@@ -130,10 +143,11 @@ public class Tsys {
                                       "0001",
                                       "4012888888881881",
                                       "0218",
-                                      "2831 NW 41st. Street, Suite E",
+                                      "8320",
                                       "85284",
-                                      "1.01");
+                                      "1.12");
             }
+//            request = test();
             URL url = new URL("https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact");
             HttpsURLConnection httpsCon = (HttpsURLConnection)url.openConnection();
             httpsCon.setRequestMethod("POST");
@@ -143,39 +157,109 @@ public class Tsys {
             httpsCon.setRequestProperty("Content-Type", mime);
             httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
 
-            System.out.println("Request");
-            System.out.println(request);
-            System.out.println("");
+            System.out.printf("\nRequest :\n\t%s\n\n",
+                              request);
             OutputStreamWriter wr = new OutputStreamWriter(httpsCon.getOutputStream());
             wr.write(request);
             wr.flush();
+            System.out.printf("\nCipher   : %s\n"
+                             +"IP       : %s\n\n",
+                              httpsCon.getCipherSuite(),
+                              InetAddress.getByName(url.getHost()).getHostAddress());
             InputStream is = httpsCon.getInputStream();
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) != -1)
                 result.write(buffer, 0, length);
-            Pattern p = Pattern.compile("^(\\d+)\\s+\\-\\s+(\\S.*)$");
+            is.close();
+            httpsCon.disconnect();
             String response = result.toString();
-            if(p.matcher(response).matches())
-                System.out.println("matches");
-            else {
-                String e = response.substring(1,2);
-                for(int i=0;i<ERROR_TYPES.length;i+=2) {
-                    if(e.equals(ERROR_TYPES[i])) {
-                        System.out.println(ERROR_TYPES[i+1]);
-                        break;
-                    }
+            String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
+            Matcher em = Pattern.compile(error_pattern).matcher(response);
+            if(em.matches()) {
+                    System.out.printf("Error :"
+                                     +"\tCode : %s\n"
+                                     +"\tText : %s\n\n\n",
+                                      em.group(1),
+                                      em.group(2));
+            } else {
+                Matcher code = Pattern.compile(authResponseRexEx()).matcher(response);
+                if(code.matches()) {
+                    System.out.printf("\n"
+                                     +"Response Code            : %s\n"
+                                     +"Approval Code            : %s\n"
+                                     +"Auth Response Text       : %s\n"
+                                     +"AVS Result Code          : %s\n"
+                                     +"Retrieval Reference Num  : %s\n"
+                                     +"Transaction Identifier   : %s\n"
+                                     +"Validation Code          : %s\n"
+                                     +"Group III Version Number : %s\n\n",
+                                      code.group(1),
+                                      code.group(2),
+                                      code.group(3).trim(),
+                                      code.group(4),
+                                      code.group(5),
+                                      code.group(6),
+                                      code.group(7),
+                                      code.group(8));
                 }
             }
-            System.out.println(response);
-            is.close();
+            if(DEBUG)
+                System.out.printf("\nFull : %s \n\n",response);
         } catch(IOException ioe) {
             System.out.println(ioe);
         } catch(Exception e) {
             System.out.println(e);
         }
     }
+    /**
+     * Auth (1080) Response RegEx
+     * D-Format Credit Card Authorization Response Message RegEx
+     * 
+     * Group 1. 2    A/N Response Code XX  4.71
+     * Group 2. 6    A/N Approval Code 4.8
+     * Group 3. 16   A/N Auth Response Text  4.11
+     * Group 4. 1    A/N AVS Result Code 4.3
+     * Group 5. 12   A/N Retrieval Reference Num 4.72
+     * Group 6. 0-15 A/N Transaction Identifier 4.91
+     * Group 7. 0-4  A/N Validation Code 4.96
+     * Group 8. 3    NUM Group III Version Number 4.44
+     * 
+     * @return String containing regex pattern to parse auth response regex
+     */
+    private String authResponseRexEx() {
+        // D-Format Credit Card Authorization Response Message
+        StringBuilder r = new StringBuilder();
+                                                // Byte Length Format Field Description Content Section
+        r.append(STX);
+        r.append('E');                          // 1     1    Record Format E 4.68
+        r.append("[024]");                      // 2     1    NUM Application Type 0=Single Transaction 4.7
+                                                //                                2=Multiple Transaction
+                                                //                                4=Interleaved
+        r.append("\\.");                        // 3     1    Message Delimiter 4.63
+        r.append("[A-Z ]");                     // 4     1    Returned ACI 4.73
+        r.append("[0-9 ]{4}");                  // 5-8   4    NUM Store Number 4.82
+        r.append("[0-9 ]{4}");                  // 9-12  4    NUM Terminal Number 4.85
+        r.append("[0-9]");                      // 13    1    Authorization Source Code 4.12
+        r.append("[0-9 ]{4}");                  // 14-17 4    NUM Transaction Sequence Num 4.92
+        r.append("([0-9]{2})");                 // 18-19 2    Response Code XX  4.71
+        r.append("([0-9A-Za-z ]{6})");          // 20-25 6    Approval Code 4.8
+        r.append("[0-9]{6}");                   // 26-31 6    NUM Local Transaction Date MMDDYY 4.55
+        r.append("[0-9]{6}");                   // 32-37 6    NUM Local Transaction Time HHMMSS 4.56
+        r.append("([0-9A-Za-z ]{16})");         // 38-53 16   Auth Response Text  4.11
+        r.append("([0-9 ])");                   // 54    1    AVS Result Code 4.3
+        r.append("([0-9A-Za-z ]{12})");         // 55-66 12   Retrieval Reference Num 4.72
+        r.append("[0-9A-Za-z ]");               // 67    1    Market Data Identifier 4.57
+        r.append("([0-9A-Za-z ]{0,15})");       // -     0-15 Transaction Identifier 4.91
+        r.append(FS);                           // -     1    Field Separator <FS>  4.41
+        r.append("([0-9A-Za-z ]{0,4})");        // -     0-4  Validation Code 4.96
+        r.append(FS);                           // -     1    Field Separator <FS> 4.41
+        r.append("([0-9]{3})?");                // -     3    NUM Group III Version Number 4.44
+        r.append("(.*)");
+        return(r.toString());
+    }
+
     private String authRequest(Merchant merchant,
                                String transSequenceNumber,
                                String cardNumber,
@@ -191,7 +275,7 @@ public class Tsys {
         c.append(merchant.getId());                         // 10-21 12   Merchant Number
         c.append(merchant.getStore());                      // 22-25 4    Store Number
         c.append(merchant.getTerminal());                   // 26-29 4    Terminal Number
-        c.append(DEVICE_CODES[0]);                          // 30    1    Device Code: Q="Third party software developer"
+        c.append(DEVICE_CODES[7]);                          // 30    1    Device Code 1 PC or 7 Third Party
         c.append(merchant.getIndustryCode());               // 31    1    Industry Code
         c.append(CURRENCY_CODES[0]);                        // 32-34 3    Currency Code: 840=U.S. Dollars
         c.append(COUNTRY_CODES[0]);                         // 35-37 3    Country Code: 840=United States
@@ -215,19 +299,48 @@ public class Tsys {
         c.append(cardNumber).append(FS);                    // - 5-76  Customer Data Field: Acct#<FS>
         c.append(expiration).append(FS);                    //                              ExpDate<FS>
         c.append(FS);                                       // - 1 Field Separator
+        address = address.replaceAll("[^a-zA-Z0-9]","");
+        if(address.length()+zip.length()>28)
+            address = address.substring(0,28-zip.length());
         c.append(address).append(' ').append(zip);          // - 0-29 Address Verification Data
         c.append(FS).append(FS);                            // - 2 Field Separator
         //String.format("%12s",amount.replace(".","")).replace(" ","0")
         c.append(amount.replace(".",""));                   // - 1-12 Transaction Amount
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
-        c.append(String.format("%-25s",merchant.getName()));// - 25 Merchant Name Left-Justified/Space-Filled
-        c.append(String.format("%-13s",merchant.getCity()));// - 13 Merchant City Left-Justified/Space-Filled
+        c.append(String.format("%-25s",merchant.getName())); // - 25 Merchant Name Left-Justified/Space-Filled
+        c.append(merchant.getPhone());                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
         c.append(merchant.getState());                      // - 2 Merchant State
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
+//        c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
+//        c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
+//        c.append(GS);                                       // - 1 Group Separator
+        c.append("007");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
+        String cvv2 = "";
+                                                            // - 6 VISA CVV2, Mastercard CVC2, AMEX CID
+                                                            // Position - Value Description
+                                                            // 1 - 0 Card Verification Value is intentionally not provided
+                                                            // 1 - 1 Card Verification Value is Present
+        
+                                                            // 2 - 0 Only the normal Response Code should be returned
+                                                            // 2 - 1 Response Code and the CVV2 / CVC2 Result Code should be returned
+                                                            // 3-6 - Card Verification Value as printed on card (right-justify/space-fill entry)
+                                                            // If position 1 = 0, 2, or 9, positions 3-6 should be space-filled.
+        if(cvv2!=null &&
+           !cvv2.isEmpty() &&
+           !cvv2.startsWith("0") &&
+           !cvv2.startsWith("2") &&
+           !cvv2.startsWith("9"))
+            c.append("11").append(String.format("%4s",cvv2)); // CVV2 Present
+        else
+            c.append("00    ");                             // - CVV2 Not Present 
         c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
         c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
+//        c.append(GS); 
+//        c.append("020");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
+//        c.append("001131B002");                             // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
                                                             //     Security transaction, such as a channel-encrypted
                                                             //     transaction (e.g., ssl, DES or RSA)
+        c.append(GS);                            // - 2 Field Separator
         return(STX+c.toString()+ETX+lrc(c.toString()+ETX));
     }
 
@@ -373,23 +486,6 @@ public class Tsys {
     }
 
     private String settleResponse() throws Exception {
-
-        HashMap<String,String> error_types = new HashMap<>();
-        error_types.put("B","Blocked Terminal");
-        error_types.put("C","Card Type Error");
-        error_types.put("D","Device Error");
-        error_types.put("E","Error in Batch");
-        error_types.put("S","Sequence Error");
-        error_types.put("T","Transmission Error");
-        error_types.put("U","Unknown Error");
-        error_types.put("V","Routing Error");
-
-        HashMap<String,String> error_record_type = new HashMap<>();
-        error_record_type.put("H","Header Record");
-        error_record_type.put("P","Parameter Record");
-        error_record_type.put("D","Detail Record");
-        error_record_type.put("T","Trailer Record");
-
         StringBuilder r = new StringBuilder();
  
  
