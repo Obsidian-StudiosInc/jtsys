@@ -145,7 +145,7 @@ public class Tsys {
                                       "0218",
                                       "8320",
                                       "85284",
-                                      "1.12");
+                                      "1.00");
             }
 //            request = test();
             URL url = new URL("https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact");
@@ -340,7 +340,7 @@ public class Tsys {
 //        c.append("001131B002");                             // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
                                                             //     Security transaction, such as a channel-encrypted
                                                             //     transaction (e.g., ssl, DES or RSA)
-        c.append(GS);                            // - 2 Field Separator
+//        c.append(GS);                            // - 2 Field Separator
         return(STX+c.toString()+ETX+lrc(c.toString()+ETX));
     }
 
@@ -491,7 +491,13 @@ public class Tsys {
  
         return(r.toString());
     }
-    
+
+    /**
+     * Generate Longitudinal Redundancy Check (LRC)
+     *
+     * @param s String to generate LRC
+     * @return char representing the LRC
+     */
     private char lrc(String s) {
         char lrc = 0;
         char[] chars = s.toCharArray();
