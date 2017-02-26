@@ -248,7 +248,7 @@ public class Tsys {
         r.append("[0-9]{6}");                   // 26-31 6    NUM Local Transaction Date MMDDYY 4.55
         r.append("[0-9]{6}");                   // 32-37 6    NUM Local Transaction Time HHMMSS 4.56
         r.append("([0-9A-Za-z ]{16})");         // 38-53 16   Auth Response Text  4.11
-        r.append("([0-9 ])");                   // 54    1    AVS Result Code 4.3
+        r.append("([0-9A-Z ])");                // 54    1    AVS Result Code 4.3
         r.append("([0-9A-Za-z ]{12})");         // 55-66 12   Retrieval Reference Num 4.72
         r.append("[0-9A-Za-z ]");               // 67    1    Market Data Identifier 4.57
         r.append("([0-9A-Za-z ]{0,15})");       // -     0-15 Transaction Identifier 4.91
