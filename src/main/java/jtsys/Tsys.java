@@ -505,4 +505,22 @@ public class Tsys {
             lrc ^= c;
         return(lrc);
     }
+
+    /**
+     * Set even parity bit
+     *
+     * @param b byte to set even parity
+     * @return byte with even parity
+     */
+    public static byte setEvenParity(byte b) {
+        short c = 0;
+        if (0 != (b & 0x01)) c++;
+        if (0 != (b & 0x02)) c++;
+        if (0 != (b & 0x04)) c++;
+        if (0 != (b & 0x08)) c++;
+        if (0 != (b & 0x10)) c++;
+        if (0 != (b & 0x20)) c++;
+        if (0 != (b & 0x40)) c++;
+        return (1 == (c % 2)) ? (byte)(b | 0x80) : b;
+    }
 }
