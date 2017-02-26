@@ -143,9 +143,9 @@ public class Tsys {
                 request = authRequest(merchant,
                                       "0001",
                                       "4012888888881881",
-                                      "218",
-                                      "",
-                                      "",
+                                      "0218",
+                                      "8320",
+                                      "85284",
                                       "1.00");
             }
 //            request = test();
