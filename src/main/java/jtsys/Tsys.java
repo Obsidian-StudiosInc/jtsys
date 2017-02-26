@@ -538,4 +538,17 @@ public class Tsys {
         if (0 != (b & 0x40)) c++;
         return (1 == (c % 2)) ? (byte)(b | 0x80) : b;
     }
+
+    /**
+     * Remove parity bit, presently only 8th bit set to 0 if 1
+     *
+     * @param a byte[] with parity bit set
+     * @return byte[] with 8th parity it removed
+     */
+    public static byte[] removeParity(byte[] a) {
+        byte[] b = new byte[a.length];
+        for (int i = 0; i < a.length; i++)
+            b[i] = (byte)(a[i] & (byte)0x7f);
+        return b;
+    }
 }
