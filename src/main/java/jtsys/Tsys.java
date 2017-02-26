@@ -7,9 +7,9 @@
 package jtsys;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -160,8 +160,8 @@ public class Tsys {
 
             System.out.printf("\nRequest :\n\t%s\n\n",
                               request);
-            OutputStreamWriter wr = new OutputStreamWriter(httpsCon.getOutputStream());
-            wr.write(request);
+            DataOutputStream wr = new DataOutputStream(httpsCon.getOutputStream());
+            wr.write(getEvenParity(request));
             wr.flush();
             System.out.printf("\nCipher   : %s\n"
                              +"IP       : %s\n\n",
