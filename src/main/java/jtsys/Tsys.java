@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -504,6 +505,20 @@ public class Tsys {
         for (char c:chars)
             lrc ^= c;
         return(lrc);
+    }
+
+    /**
+     * Get even parity, returns string as a byte array with even parity
+     *
+     * @param s string to be converted
+     * @return byte[] with even parity bytes
+     */
+    public static byte[] getEvenParity(String s) {
+        byte[] a = s.getBytes(StandardCharsets.US_ASCII);
+        byte[] b = new byte[a.length];
+        for (int i = 0; i < a.length; i++)
+            b[i] = setEvenParity(a[i]);
+        return b;
     }
 
     /**
