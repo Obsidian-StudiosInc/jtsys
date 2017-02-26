@@ -143,9 +143,9 @@ public class Tsys {
                 request = authRequest(merchant,
                                       "0001",
                                       "4012888888881881",
-                                      "0218",
-                                      "8320",
-                                      "85284",
+                                      "218",
+                                      "",
+                                      "",
                                       "1.00");
             }
 //            request = test();
@@ -308,14 +308,12 @@ public class Tsys {
         c.append(amount.replace(".",""));                   // - 1-12 Transaction Amount
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
         c.append(String.format("%-25s",merchant.getName())); // - 25 Merchant Name Left-Justified/Space-Filled
-        c.append(merchant.getPhone());                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
+        c.append(String.format("%-13s",merchant.getCity()));                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
+//        c.append(merchant.getPhone());                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
         c.append(merchant.getState());                      // - 2 Merchant State
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
-        c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
-        c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
-        c.append(GS);                                       // - 1 Group Separator
-        c.append("007");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
-        String cvv2 = "";
+//        c.append("007");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
+//        String cvv2 = "";
                                                             // - 6 VISA CVV2, Mastercard CVC2, AMEX CID
                                                             // Position - Value Description
                                                             // 1 - 0 Card Verification Value is intentionally not provided
@@ -325,14 +323,15 @@ public class Tsys {
                                                             // 2 - 1 Response Code and the CVV2 / CVC2 Result Code should be returned
                                                             // 3-6 - Card Verification Value as printed on card (right-justify/space-fill entry)
                                                             // If position 1 = 0, 2, or 9, positions 3-6 should be space-filled.
-        if(cvv2!=null &&
-           !cvv2.isEmpty() &&
-           !cvv2.startsWith("0") &&
-           !cvv2.startsWith("2") &&
-           !cvv2.startsWith("9"))
-            c.append("11").append(String.format("%4s",cvv2)); // CVV2 Present
-        else
-            c.append("00    ");                             // - CVV2 Not Present 
+//        if(cvv2!=null &&
+//           !cvv2.isEmpty() &&
+//           !cvv2.startsWith("0") &&
+//           !cvv2.startsWith("2") &&
+//           !cvv2.startsWith("9"))
+//            c.append("11").append(String.format("%4s",cvv2)); // CVV2 Present
+//        else
+//            c.append("00    ");                             // - CVV2 Not Present 
+//        c.append(GS);                                       // - 1 Group Separator
         c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
         c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
 //        c.append(GS); 
