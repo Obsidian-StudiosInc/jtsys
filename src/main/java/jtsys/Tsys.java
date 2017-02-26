@@ -163,8 +163,8 @@ public class Tsys {
             DataOutputStream wr = new DataOutputStream(httpsCon.getOutputStream());
             wr.write(getEvenParity(request));
             wr.flush();
-            System.out.printf("\nCipher   : %s\n"
-                             +"IP       : %s\n\n",
+            System.out.printf("Cipher                   : %s\n"
+                             +"IP                       : %s\n",
                               httpsCon.getCipherSuite(),
                               InetAddress.getByName(url.getHost()).getHostAddress());
             InputStream is = httpsCon.getInputStream();
@@ -175,7 +175,7 @@ public class Tsys {
                 result.write(buffer, 0, length);
             is.close();
             httpsCon.disconnect();
-            String response = result.toString();
+            String response = new String(removeParity(result.toByteArray()));
             String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
             Matcher em = Pattern.compile(error_pattern).matcher(response);
             if(em.matches()) {
@@ -187,8 +187,7 @@ public class Tsys {
             } else {
                 Matcher code = Pattern.compile(authResponseRexEx()).matcher(response);
                 if(code.matches()) {
-                    System.out.printf("\n"
-                                     +"Response Code            : %s\n"
+                    System.out.printf("Response Code            : %s\n"
                                      +"Approval Code            : %s\n"
                                      +"Auth Response Text       : %s\n"
                                      +"AVS Result Code          : %s\n"
