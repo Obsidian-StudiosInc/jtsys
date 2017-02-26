@@ -312,9 +312,9 @@ public class Tsys {
         c.append(merchant.getPhone());                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
         c.append(merchant.getState());                      // - 2 Merchant State
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
-//        c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
-//        c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
-//        c.append(GS);                                       // - 1 Group Separator
+        c.append("014");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
+        c.append('7');                                      // - 1 MOTO/Electronic Com. Ind: 7= Non-Authenticated
+        c.append(GS);                                       // - 1 Group Separator
         c.append("007");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
         String cvv2 = "";
                                                             // - 6 VISA CVV2, Mastercard CVC2, AMEX CID
