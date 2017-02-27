@@ -131,25 +131,30 @@ public class Tsys {
     }
 
     private void authTest() {
-        LinkedHashMap<String,String> a = auth(testMerchant(),
-                                              "0001",
-                                              "4012888888881881",
-                                              "0218",
-                                              "8320",
-                                              "85284",
-                                              "1.00");
-        if(a.size()==2) {
-                System.out.print("Error :\n");
-            a.forEach((k,v) -> {
-                System.out.printf("\t%s : %s\n",k,v);
-            });
-            System.out.print("\n");
-        } else {
-            System.out.print("Auth response :\n");
-            a.forEach((k,v) -> {
-                System.out.printf("\t%-25s : %s\n",k,v);
-            });
-            System.out.print("\n");
+        try {
+            String r = authRequest(testMerchant(),
+                                   "0001",
+                                   "4012888888881881",
+                                   "0218",
+                                   "8320",
+                                   "85284",
+                                   "1.00");
+            LinkedHashMap<String,String> a = submit(r,MIME[0]);
+            if(a.size()==2) {
+                    System.out.print("Error :\n");
+                a.forEach((k,v) -> {
+                    System.out.printf("\t%s : %s\n",k,v);
+                });
+                System.out.print("\n");
+            } else {
+                System.out.print("Auth response :\n");
+                a.forEach((k,v) -> {
+                    System.out.printf("\t%-25s : %s\n",k,v);
+                });
+                System.out.print("\n");
+            }
+        } catch(Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -169,24 +174,12 @@ public class Tsys {
         return(msg.toString());
     }
 
-    private LinkedHashMap<String,String> auth(Merchant merchant,
-                                              String transSequenceNumber,
-                                              String cardNumber,
-                                              String expiration,
-                                              String address,
-                                              String zip,
-                                              String amount) {
+    private LinkedHashMap<String,String> submit(String request,
+                                                String mime) {
         LinkedHashMap<String,String> map = null;
         try {
-            String request = request = authRequest(merchant,
-                                                   transSequenceNumber,
-                                                   cardNumber,
-                                                   expiration,
-                                                   address,
-                                                   zip,
-                                                   amount);
             HttpsURLConnection httpsCon = getHttpsConnection();
-            httpsCon.setRequestProperty("Content-Type", MIME[0]);
+            httpsCon.setRequestProperty("Content-Type", mime);
             httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
             System.out.printf("\nRequest :\n\t%s\n\n",
                               request);
