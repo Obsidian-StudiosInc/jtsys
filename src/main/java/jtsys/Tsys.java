@@ -213,52 +213,6 @@ public class Tsys {
             System.out.println(e);
         }
     }
-    /**
-     * Auth (1080) Response RegEx
-     * D-Format Credit Card Authorization Response Message RegEx
-     * 
-     * Group 1. 2    A/N Response Code XX  4.71
-     * Group 2. 6    A/N Approval Code 4.8
-     * Group 3. 16   A/N Auth Response Text  4.11
-     * Group 4. 1    A/N AVS Result Code 4.3
-     * Group 5. 12   A/N Retrieval Reference Num 4.72
-     * Group 6. 0-15 A/N Transaction Identifier 4.91
-     * Group 7. 0-4  A/N Validation Code 4.96
-     * Group 8. 3    NUM Group III Version Number 4.44
-     * 
-     * @return String containing regex pattern to parse auth response regex
-     */
-    private String authResponseRexEx() {
-        // D-Format Credit Card Authorization Response Message
-        StringBuilder r = new StringBuilder();
-                                                // Byte Length Format Field Description Content Section
-        r.append(STX);
-        r.append('E');                          // 1     1    Record Format E 4.68
-        r.append("[024]");                      // 2     1    NUM Application Type 0=Single Transaction 4.7
-                                                //                                2=Multiple Transaction
-                                                //                                4=Interleaved
-        r.append("\\.");                        // 3     1    Message Delimiter 4.63
-        r.append("[A-Z ]");                     // 4     1    Returned ACI 4.73
-        r.append("[0-9 ]{4}");                  // 5-8   4    NUM Store Number 4.82
-        r.append("[0-9 ]{4}");                  // 9-12  4    NUM Terminal Number 4.85
-        r.append("[0-9]");                      // 13    1    Authorization Source Code 4.12
-        r.append("[0-9 ]{4}");                  // 14-17 4    NUM Transaction Sequence Num 4.92
-        r.append("([0-9]{2})");                 // 18-19 2    Response Code XX  4.71
-        r.append("([0-9A-Za-z ]{6})");          // 20-25 6    Approval Code 4.8
-        r.append("[0-9]{6}");                   // 26-31 6    NUM Local Transaction Date MMDDYY 4.55
-        r.append("[0-9]{6}");                   // 32-37 6    NUM Local Transaction Time HHMMSS 4.56
-        r.append("([0-9A-Za-z ]{16})");         // 38-53 16   Auth Response Text  4.11
-        r.append("([0-9A-Z ])");                // 54    1    AVS Result Code 4.3
-        r.append("([0-9A-Za-z ]{12})");         // 55-66 12   Retrieval Reference Num 4.72
-        r.append("[0-9A-Za-z ]");               // 67    1    Market Data Identifier 4.57
-        r.append("([0-9A-Za-z ]{0,15})");       // -     0-15 Transaction Identifier 4.91
-        r.append(FS);                           // -     1    Field Separator <FS>  4.41
-        r.append("([0-9A-Za-z ]{0,4})");        // -     0-4  Validation Code 4.96
-        r.append(FS);                           // -     1    Field Separator <FS> 4.41
-        r.append("([0-9]{3})?");                // -     3    NUM Group III Version Number 4.44
-        r.append("(.*)");
-        return(r.toString());
-    }
 
     private String authRequest(Merchant merchant,
                                String transSequenceNumber,
@@ -341,6 +295,53 @@ public class Tsys {
                                                             //     transaction (e.g., ssl, DES or RSA)
 //        c.append(GS);                            // - 2 Field Separator
         return(STX+c.toString()+ETX+lrc(c.toString()+ETX));
+    }
+
+    /**
+     * Auth (1080) Response RegEx
+     * D-Format Credit Card Authorization Response Message RegEx
+     * 
+     * Group 1. 2    A/N Response Code XX  4.71
+     * Group 2. 6    A/N Approval Code 4.8
+     * Group 3. 16   A/N Auth Response Text  4.11
+     * Group 4. 1    A/N AVS Result Code 4.3
+     * Group 5. 12   A/N Retrieval Reference Num 4.72
+     * Group 6. 0-15 A/N Transaction Identifier 4.91
+     * Group 7. 0-4  A/N Validation Code 4.96
+     * Group 8. 3    NUM Group III Version Number 4.44
+     * 
+     * @return String containing regex pattern to parse auth response regex
+     */
+    private String authResponseRexEx() {
+        // D-Format Credit Card Authorization Response Message
+        StringBuilder r = new StringBuilder();
+                                                // Byte Length Format Field Description Content Section
+        r.append(STX);
+        r.append('E');                          // 1     1    Record Format E 4.68
+        r.append("[024]");                      // 2     1    NUM Application Type 0=Single Transaction 4.7
+                                                //                                2=Multiple Transaction
+                                                //                                4=Interleaved
+        r.append("\\.");                        // 3     1    Message Delimiter 4.63
+        r.append("[A-Z ]");                     // 4     1    Returned ACI 4.73
+        r.append("[0-9 ]{4}");                  // 5-8   4    NUM Store Number 4.82
+        r.append("[0-9 ]{4}");                  // 9-12  4    NUM Terminal Number 4.85
+        r.append("[0-9]");                      // 13    1    Authorization Source Code 4.12
+        r.append("[0-9 ]{4}");                  // 14-17 4    NUM Transaction Sequence Num 4.92
+        r.append("([0-9]{2})");                 // 18-19 2    Response Code XX  4.71
+        r.append("([0-9A-Za-z ]{6})");          // 20-25 6    Approval Code 4.8
+        r.append("[0-9]{6}");                   // 26-31 6    NUM Local Transaction Date MMDDYY 4.55
+        r.append("[0-9]{6}");                   // 32-37 6    NUM Local Transaction Time HHMMSS 4.56
+        r.append("([0-9A-Za-z ]{16})");         // 38-53 16   Auth Response Text  4.11
+        r.append("([0-9A-Z ])");                // 54    1    AVS Result Code 4.3
+        r.append("([0-9A-Za-z ]{12})");         // 55-66 12   Retrieval Reference Num 4.72
+        r.append("[0-9A-Za-z ]");               // 67    1    Market Data Identifier 4.57
+        r.append("([0-9A-Za-z ]{0,15})");       // -     0-15 Transaction Identifier 4.91
+        r.append(FS);                           // -     1    Field Separator <FS>  4.41
+        r.append("([0-9A-Za-z ]{0,4})");        // -     0-4  Validation Code 4.96
+        r.append(FS);                           // -     1    Field Separator <FS> 4.41
+        r.append("([0-9]{3})?");                // -     3    NUM Group III Version Number 4.44
+        r.append("(.*)");
+        return(r.toString());
     }
 
     /* K 1081 Settle
