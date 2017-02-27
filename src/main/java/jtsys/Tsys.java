@@ -11,6 +11,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -78,11 +80,22 @@ public class Tsys {
         "D","Detail Record",
         "T","Trailer Record"
     };
+    private final static String TSYS_URL = "https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact";
 
     public static void main(String[] args) {
 //        System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_CBC_SHA256");
         Tsys tsys = new Tsys();
         tsys.submit("Auth",testMerchant());
+    }
+
+    private HttpsURLConnection getHttpsConnection() throws IOException {
+        URL url = new URL(TSYS_URL);
+        HttpsURLConnection httpsCon = (HttpsURLConnection)url.openConnection();
+        httpsCon.setRequestMethod("POST");
+        httpsCon.setDoOutput(true);
+        httpsCon.setDoInput(true);
+        httpsCon.setUseCaches(false);
+        return(httpsCon);
     }
 
     private static Merchant testMerchant() {
@@ -149,12 +162,7 @@ public class Tsys {
                                       "1.00");
             }
 //            request = test();
-            URL url = new URL("https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact");
-            HttpsURLConnection httpsCon = (HttpsURLConnection)url.openConnection();
-            httpsCon.setRequestMethod("POST");
-            httpsCon.setDoOutput(true);
-            httpsCon.setDoInput(true);
-            httpsCon.setUseCaches(false);
+            HttpsURLConnection httpsCon = getHttpsConnection();
             httpsCon.setRequestProperty("Content-Type", mime);
             httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
 
@@ -166,7 +174,7 @@ public class Tsys {
             System.out.printf("Cipher                   : %s\n"
                              +"IP                       : %s\n",
                               httpsCon.getCipherSuite(),
-                              InetAddress.getByName(url.getHost()).getHostAddress());
+                              InetAddress.getByName(httpsCon.getURL().getHost()).getHostAddress());
             InputStream is = httpsCon.getInputStream();
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
