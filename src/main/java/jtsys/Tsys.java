@@ -11,12 +11,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +57,20 @@ public class Tsys {
         707,                                                // 707=MST
         708,                                                // 708=PST
     };
+    private final String[] AUTH_RESPONSE_KEYS = {
+        "Response Code",
+        "Approval Code",
+        "Auth Response Text",
+        "AVS Result Code",
+        "Retrieval Reference Num",
+        "Transaction Identifier",
+        "Validation Code",
+        "Group III Version Number"
+    };
+    private final String[] ERROR_RESPONSE_KEYS = {
+        "Code",
+        "Text"
+    };
     private final String[] MIME = {
         "x-Visa-II/x-auth",                                 // Auth mime
         "x-Visa-II/x-settle"                                // Settle mime
@@ -85,7 +98,7 @@ public class Tsys {
     public static void main(String[] args) {
 //        System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_CBC_SHA256");
         Tsys tsys = new Tsys();
-        tsys.submit("Auth",testMerchant());
+        tsys.authTest();
     }
 
     private HttpsURLConnection getHttpsConnection() throws IOException {
@@ -117,6 +130,29 @@ public class Tsys {
         return(m);
     }
 
+    private void authTest() {
+        LinkedHashMap<String,String> a = auth(testMerchant(),
+                                              "0001",
+                                              "4012888888881881",
+                                              "0218",
+                                              "8320",
+                                              "85284",
+                                              "1.00");
+        if(a.size()==2) {
+                System.out.print("Error :\n");
+            a.forEach((k,v) -> {
+                System.out.printf("\t%s : %s\n",k,v);
+            });
+            System.out.print("\n");
+        } else {
+            System.out.print("Auth response :\n");
+            a.forEach((k,v) -> {
+                System.out.printf("\t%-25s : %s\n",k,v);
+            });
+            System.out.print("\n");
+        }
+    }
+
     private String seperator(String obj,
                              String s,
                              int length,
@@ -133,39 +169,25 @@ public class Tsys {
         return(msg.toString());
     }
 
-    private void submit(String action,
-                        Merchant merchant) {
+    private LinkedHashMap<String,String> auth(Merchant merchant,
+                                              String transSequenceNumber,
+                                              String cardNumber,
+                                              String expiration,
+                                              String address,
+                                              String zip,
+                                              String amount) {
+        LinkedHashMap<String,String> map = null;
         try {
-            String mime = MIME[0];
-            String request = new String();
-            if(action.equals("settle")) {
-                mime = MIME[1];
-                request = settleRequest(merchant,
-                                        "cardNumber",
-                                        "transSequenceNumber",
-                                        "aci",
-                                        "authSourceCode",
-                                        "authCode",
-                                        "avsCode",
-                                        "transId",
-                                        "validationCode",
-                                        "amount",
-                                        "purchaseId",
-                                        "batchNumber");
-            } else {
-                request = authRequest(merchant,
-                                      "0001",
-                                      "4012888888881881",
-                                      "0218",
-                                      "8320",
-                                      "85284",
-                                      "1.00");
-            }
-//            request = test();
+            String request = request = authRequest(merchant,
+                                                   transSequenceNumber,
+                                                   cardNumber,
+                                                   expiration,
+                                                   address,
+                                                   zip,
+                                                   amount);
             HttpsURLConnection httpsCon = getHttpsConnection();
-            httpsCon.setRequestProperty("Content-Type", mime);
+            httpsCon.setRequestProperty("Content-Type", MIME[0]);
             httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
-
             System.out.printf("\nRequest :\n\t%s\n\n",
                               request);
             DataOutputStream wr = new DataOutputStream(httpsCon.getOutputStream());
@@ -183,36 +205,19 @@ public class Tsys {
                 result.write(buffer, 0, length);
             is.close();
             httpsCon.disconnect();
+            map = new LinkedHashMap<String,String>();
             String response = new String(removeParity(result.toByteArray()));
             String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
-            Matcher em = Pattern.compile(error_pattern).matcher(response);
-            if(em.matches()) {
-                    System.out.printf("Error :"
-                                     +"\tCode : %s\n"
-                                     +"\tText : %s\n\n\n",
-                                      em.group(1),
-                                      em.group(2));
-            } else {
-                Matcher code = Pattern.compile(authResponseRexEx()).matcher(response);
-                if(code.matches()) {
-                    System.out.printf("Response Code            : %s\n"
-                                     +"Approval Code            : %s\n"
-                                     +"Auth Response Text       : %s\n"
-                                     +"AVS Result Code          : %s\n"
-                                     +"Retrieval Reference Num  : %s\n"
-                                     +"Transaction Identifier   : %s\n"
-                                     +"Validation Code          : %s\n"
-                                     +"Group III Version Number : %s\n\n",
-                                      code.group(1),
-                                      code.group(2),
-                                      code.group(3).trim(),
-                                      code.group(4),
-                                      code.group(5),
-                                      code.group(6),
-                                      code.group(7),
-                                      code.group(8));
-                }
-            }
+            Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
+            Matcher error = Pattern.compile(error_pattern).matcher(response);
+            if(auth.matches()) {
+                for(int i=0;1<AUTH_RESPONSE_KEYS.length;i++)
+                    map.put(AUTH_RESPONSE_KEYS[i],auth.group(i+1));
+            } else if(error.matches()) {
+                for(int i=0;1<ERROR_RESPONSE_KEYS.length;i++)
+                    map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
+            } else
+                System.out.printf("\nUnmatched response : %s \n\n",response);
             if(DEBUG)
                 System.out.printf("\nFull : %s \n\n",response);
         } catch(IOException ioe) {
@@ -220,6 +225,7 @@ public class Tsys {
         } catch(Exception e) {
             System.out.println(e);
         }
+        return(map);
     }
 
     private String authRequest(Merchant merchant,
