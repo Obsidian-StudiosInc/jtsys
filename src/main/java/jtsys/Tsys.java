@@ -132,10 +132,10 @@ public class Tsys {
         }
     }
 
-    private String seperator(String obj,
-                             String s,
-                             int length,
-                             char etbx) throws Exception {
+    public String separator(String obj,
+                            String s,
+                            int length,
+                            char etbx) throws Exception {
         if(s.length()!=length)
             throw new Exception(obj+" length is "+s.length()+" and should be "+length);
         return (STX+s+etbx+lrc(s+etbx));
@@ -144,7 +144,7 @@ public class Tsys {
     private String testRequest() throws Exception {
         String t = "D4.999995";   // D2. DO
         StringBuilder msg = new StringBuilder(); 
-        msg.append(seperator("test",t,t.length(),ETX));
+        msg.append(separator("test",t,t.length(),ETX));
         return(msg.toString());
     }
 
@@ -462,7 +462,7 @@ public class Tsys {
         h.append('0');                                      // 65    1  NUM Blocking Indicator 0=Not Blocked (4.23)
 
         StringBuilder msg = new StringBuilder();
-        msg.append(seperator("Header",h.toString(),65,ETB));
+        msg.append(separator("Header",h.toString(),65,ETB));
 
         // K-Format Parameter Record (Base Group)
         // Byte Length Frmt Field Description Content Section
@@ -480,7 +480,7 @@ public class Tsys {
         p.append("00001");                                  // 66-70 5 A/N Merchant Location Number 00001 (4.120)
         p.append(merchant.getV());                          // 71-78 8 NUM V Number 00000001 (4.194)
 
-        msg.append(seperator("Parameters",p.toString(),78,ETB));
+        msg.append(separator("Parameters",p.toString(),78,ETB));
 
         /* K-Format Detail Record (Electronic Commerce)
          * Byte Size Frmt Field Description Content Section
@@ -539,7 +539,7 @@ public class Tsys {
         d.append("01");                                     // 149-150 2 NUM Multiple Clearing Sequence Count (1.128)
         d.append('7');                                      // 151 1 A/N MOTO/Electronic Commerce Indicator 7 = Channel Encrypted (4.127)
 
-        msg.append(seperator("Detail",d.toString(),151,ETB));
+        msg.append(separator("Detail",d.toString(),151,ETB));
 
         // K-Format Trailer Record
         // Byte Length Frmt Field Description Content Section
@@ -556,7 +556,7 @@ public class Tsys {
         t.append("0000000000000000");                       // 42-57 16 NUM Cashback Total (4.38)
         t.append(my_amount);                                // 58-73 16 NUM Batch Net Deposit Purchases - Returns (4.17)
 
-        msg.append(seperator("Trailer",t.toString(),73,ETX));
+        msg.append(separator("Trailer",t.toString(),73,ETX));
 
         return(msg.toString());
     }
