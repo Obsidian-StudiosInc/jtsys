@@ -10,25 +10,18 @@ package jtsys;
  * @author William L. Thomson Jr. <wlt@o-sinc.com>
  */
 public enum AuthResponseKeys {
+    ACI,
+    Auth_Source_Code,
+    Response_Code,
+    Approval_Code,
+    Auth_Response_Text,
+    AVS_Result_Code,
+    Retrieval_Reference_Num,
+    Transaction_Identifier,
+    Validation_Code,
+    Group_III_Version_Number;
 
-    ACI("ACI"),
-    ASC("Auth Source Code"),
-    RC("Response Code"),
-    AC("Approval Code"),
-    ART("Auth Response Text"),
-    AVS("AVS Result Code"),
-    RRN("Retrieval Reference Num"),
-    TI("Transaction Identifier"),
-    VC("Validation Code"),
-    GVN("Group III Version Number");
-
-    private String key;
-    
-    AuthResponseKeys(String key) {
-        this.key = key;
-    }
-    
     public String key() {
-        return this.key;
+        return(this.name().replace("_"," "));
     }
 }
