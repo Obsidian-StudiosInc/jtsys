@@ -73,6 +73,13 @@ public class Tsys {
         "Code",
         "Text"
     };
+    private final String[] SETTLE_RESPONSE_KEYS = {
+        "Batch Record Count",
+        "Batch Net Deposit",
+        "Batch Response Code",
+        "Batch Number",
+        "Batch Response Text"
+    };
     private final String[] MIME = {
         "x-Visa-II/x-auth",                                 // Auth mime
         "x-Visa-II/x-settle"                                // Settle mime
@@ -496,10 +503,35 @@ public class Tsys {
         return(msg.toString());
     }
 
-    private String settleResponse() throws Exception {
+    /**
+     * Settle (1081) Response RegEx
+     * K-Format Trailer “GB” Response Record RegEx
+     *
+     * Group 1.  9    Batch Record Count Right-Justified/Zero-Filled 4.19
+     * Group 2.  16   Batch Net Deposit Right-Justified/Zero-Filled 4.17
+     * Group 3.  2    Batch Response Code GB 4.20
+     * Group 4.  3    Batch Number 999 4.18
+     * Group 5.  9    Batch Response Text _ACCEPTED 4.21
+     *
+     * @return String containing regex pattern to parse settle response regex
+     */
+    private String settleResponseRexEx() {
+        // K-Format Trailer “GB” Response Record
         StringBuilder r = new StringBuilder();
- 
- 
+        r.append(STX);
+        r.append('K');                          // 1     1    Record Format K 4.154
+        r.append("[1,3]");                      // 2     1    Application Type 1=Single 3=Multiple Batch 4.10
+        r.append("\\.");                        // 3     1    Message Delimiter 4.123
+        r.append("Z");                          // 4     1    X.25 Routing ID Z 4.226
+        r.append("R@@@@");                      // 5-9   5    Record Type R@@@@ 4.155
+        r.append("([0-9]{9})");                 // 10-18 9    Batch Record Count Right-Justified/Zero-Filled 4.19
+        r.append("([0-9]{16})");                // 19-34 16   Batch Net Deposit Right-Justified/Zero-Filled 4.17
+        r.append("([A-Z]{2})");                 // 35-36 2    Batch Response Code GB 4.20
+        r.append("00");                         // 37-38 2    Filler 00 4.79
+        r.append("([0-9]{3})");                 // 39-41 3    Batch Number 999 4.18
+        r.append("([ _A-Z0-9]{9})");            // 42-50 9    Batch Response Text _ACCEPTED 4.21
+        r.append(".{16}");                      // 51-66 16   Filler Spaces 4.78
+        r.append("(.*)");
         return(r.toString());
     }
 
