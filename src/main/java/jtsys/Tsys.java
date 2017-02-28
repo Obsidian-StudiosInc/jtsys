@@ -412,7 +412,8 @@ public class Tsys {
         h.append(TIME_ZONES[0]);                            // 55-57 3  NUM Time Zone Differential (4.200)
         Date date = new Date();
         h.append(new SimpleDateFormat("MMdd").format(date)); // 58-61 4  NUM Batch Transmission Date MMDD (4.22)
-        h.append(batchNumber);                              // 62-64 3  NUM Batch Number 001 - 999 (4.18)
+        String my_batchNumber = String.format("%3.3s",batchNumber).replace(" ","0");
+        h.append(my_batchNumber);                              // 62-64 3  NUM Batch Number 001 - 999 (4.18)
         h.append('0');                                      // 65    1  NUM Blocking Indicator 0=Not Blocked (4.23)
 
         StringBuilder msg = new StringBuilder();
@@ -426,11 +427,11 @@ public class Tsys {
                                                             // 4   1 A/N X.25 Routing ID: Z (4.226)
                                                             // 5-9 5 A/N Record Type: P@@@@ (4.155)
         p.append("840");                                    // 10-12 3 NUM Country Code 840 (4.47)
-        p.append(String.format("%-9s",merchant.getZip()));  // 13-21 9 A/N City Code Left-Justified/Space-Filled (4.43)
+        p.append(String.format("%-9.9s",merchant.getZip())); // 13-21 9 A/N City Code Left-Justified/Space-Filled (4.43)
         p.append(merchant.getMcc());                        // 22-25 4 NUM Merchant Category Code (4.116)
-        p.append(String.format("%-25s",merchant.getName()));// 26-50 25 A/N Merchant Name Left-Justified/Space-Filled (4.27.1)
-        p.append(String.format("%-13s",merchant.getCity()));// 51-63 13 A/N Merchant City Left-Justified/Space-Filled (4.27.2)
-        p.append(merchant.getState());                      // 64-65 2 A/N Merchant State (4.27.3)
+        p.append(String.format("%-25.25S",merchant.getName())); // 26-50 25 A/N Merchant Name Left-Justified/Space-Filled (4.27.1)
+        p.append(String.format("%-13.13S",merchant.getCity())); // 51-63 13 A/N Merchant City Left-Justified/Space-Filled (4.27.2)
+        p.append(String.format("%-2.2S",merchant.getState())); // 64-65 2 A/N Merchant State (4.27.3)
         p.append("00001");                                  // 66-70 5 A/N Merchant Location Number 00001 (4.120)
         p.append(merchant.getV());                          // 71-78 8 NUM V Number 00000001 (4.194)
 
@@ -451,7 +452,7 @@ public class Tsys {
                                                             //        CPS/Card Not Present or
                                                             //        Electronic Commerce)
         d.append('@');                                      // 13  1 A/N Account Data Source Code @ = No Cardreader (4.1)
-        d.append(String.format("%-22s",cardNumber));        // 14-35 22 A/N Cardholder Account Number Left-Justified/Space-Filled (4.30)
+        d.append(String.format("%-22.22s",cardNumber));     // 14-35 22 A/N Cardholder Account Number Left-Justified/Space-Filled (4.30)
         d.append('Y');                                      // 36  1 Requested ACI (Authorization Characteristics Indicator): N (4.163)
         if(aci==null || aci.isEmpty())
             aci = " ";
@@ -461,9 +462,9 @@ public class Tsys {
         d.append(authSourceCode);                           // 38 1 A/N Authorization Source Code (4.13)
         if(transSequenceNumber==null || transSequenceNumber.isEmpty())
             throw new Exception("Transaction Sequence Number missing");
-        d.append(String.format("%4s",transSequenceNumber).replace(" ","0")); // 39-42 4 NUM Transaction Sequence Number Right-Justified/Zero-Filled (4.207)
+        d.append(String.format("%4.4s",transSequenceNumber).replace(" ","0")); // 39-42 4 NUM Transaction Sequence Number Right-Justified/Zero-Filled (4.207)
         d.append(responseCode);                             // 43-44 2 A/N Response Code (4.164)
-        d.append(String.format("%-6s",authCode));           // 45-50 6 A/N Authorization Code Left-Justified/Space-Filled (4.12)
+        d.append(String.format("%-6.6s",authCode));         // 45-50 6 A/N Authorization Code Left-Justified/Space-Filled (4.12)
         d.append(new SimpleDateFormat("MMdd").format(date)); // 51-54 4 NUM Local Transaction Date MMDD (4.113)
         d.append(new SimpleDateFormat("hhmmss").format(date)); // 55-60 6 NUM Local Transaction Time HHMMSS (4.114)
         // From auth
@@ -472,7 +473,7 @@ public class Tsys {
         d.append(avsCode);                           // 61  1 A/N AVS Result Code (4.3)
         if(transId==null || transId.isEmpty())
             transId = "000000000000000";
-        d.append(String.format("%-15s",transId));           // 62-76 15 A/N Transaction Identifier Left-Justified/Space-Filled (4.206)
+        d.append(String.format("%-15.15s",transId));           // 62-76 15 A/N Transaction Identifier Left-Justified/Space-Filled (4.206)
         if(validationCode==null || validationCode.isEmpty())
             validationCode = "    ";
         d.append(validationCode);                           // 77-80 4 A/N Validation Code (4.218)
@@ -480,13 +481,13 @@ public class Tsys {
         d.append("00");                                     // 82-83 2 NUM Transaction Status Code 00 (4.208)
         d.append('0');                                      // 84   1 A/N Reimbursement Attribute 0 (4.157)
         
-        String my_amount = String.format("%12s",amount.replace(".","")).replace(" ","0");
+        String my_amount = String.format("%12.12s",amount.replace(".","")).replace(" ","0");
         d.append(my_amount);                                // 85-96 12 NUM Settlement Amount Right-Justified/Zero-Filled (4.175)
         d.append(my_amount);                                // 97-108 12 NUM Authorized Amount Right-Justified/Zero-Filled (4.14)
         d.append(my_amount);                                // 109-120 12 NUM Total Authorized Amount Right-Justified/Zero-Filled (4.201)
         // d.append('1');
         d.append('0');                                      // 121   1 A/N Purchase Identifier Format Code 1 (4.150)
-        d.append(String.format("%-25s",purchaseId));        // 122-146 25 A/N Purchase Identifier Left-Justified/Space-Filled (4.149)
+        d.append(String.format("%-25.25s",purchaseId));        // 122-146 25 A/N Purchase Identifier Left-Justified/Space-Filled (4.149)
 // ???
         d.append("01");                                     // 147-148 2 NUM Multiple Clearing Sequence Number (4.129)
 // ???
@@ -503,9 +504,9 @@ public class Tsys {
                                                             // 4    1 A/N X.25 Routing ID Z (4.226)
                                                             // 5-9  5 A/N Record Type T@@@@ (4.155)
         t.append(new SimpleDateFormat("MMdd").format(date)); // 10-13  4 NUM Batch Transmission Date MMDD (4.22)
-        t.append(batchNumber);                              // 14-16  3 NUM Batch Number 001 - 999 (4.18)
-        t.append(String.format("%9s","1").replace(" ","0")); // 17-25  9 NUM Batch Record Count Right-Justified/Zero-Filled (4.19)
-        my_amount = String.format("%16s",my_amount).replace(" ","0");
+        t.append(my_batchNumber);                           // 14-16  3 NUM Batch Number 001 - 999 (4.18)
+        t.append(String.format("%9.9s","1").replace(" ","0")); // 17-25  9 NUM Batch Record Count Right-Justified/Zero-Filled (4.19)
+        my_amount = String.format("%16.16s",my_amount).replace(" ","0");
         t.append(my_amount);                                // 26-41 16 NUM Batch Hashing Total Purchases + Returns (4.16)
         t.append("0000000000000000");                       // 42-57 16 NUM Cashback Total (4.38)
         t.append(my_amount);                                // 58-73 16 NUM Batch Net Deposit Purchases - Returns (4.17)
