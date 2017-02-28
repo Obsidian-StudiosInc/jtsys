@@ -206,7 +206,7 @@ public class Tsys {
         c.append(merchant.getIndustryCode());               // 31    1    Industry Code
         c.append(CURRENCY_CODES[0]);                        // 32-34 3    Currency Code: 840=U.S. Dollars
         c.append(COUNTRY_CODES[0]);                         // 35-37 3    Country Code: 840=United States
-        c.append(String.format("%-9s",merchant.getZip()));  // 38-46 9    (Merchant) City Code(Zip);
+        c.append(String.format("%-9.9s",merchant.getZip())); // 38-46 9    (Merchant) City Code(Zip);
         c.append(LANGUAGES[0]);                             // 47-48 2    Language Indicator: 00=English
         c.append(TIME_ZONES[0]);                            // 49-51 3    Time Zone Differential: 705=EST
         c.append(merchant.getMcc());                        // 52-55 4    Metchant Category Code
@@ -234,10 +234,10 @@ public class Tsys {
         //String.format("%12s",amount.replace(".","")).replace(" ","0")
         c.append(amount.replace(".",""));                   // - 1-12 Transaction Amount
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
-        c.append(String.format("%-25s",merchant.getName())); // - 25 Merchant Name Left-Justified/Space-Filled
-        c.append(String.format("%-13s",merchant.getCity()));                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
+        c.append(String.format("%-25.15s",merchant.getName())); // - 25 Merchant Name Left-Justified/Space-Filled
+        c.append(String.format("%-13.13s",merchant.getCity())); // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
 //        c.append(merchant.getPhone());                      // - 13 Customer Service Phone Number NNN-NNNNNNN (dash is required)
-        c.append(merchant.getState());                      // - 2 Merchant State
+        c.append(String.format("%-2.2S",merchant.getState())); // - 2 Merchant State
         c.append(FS).append(FS).append(FS);                 // - 3 Field Separator
 //        c.append("007");                                    // - 3 Group III Version Number: 014=MOTO/Electronic Commerce
 //        String cvv2 = "";
