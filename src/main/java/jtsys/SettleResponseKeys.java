@@ -11,19 +11,13 @@ package jtsys;
  */
 public enum SettleResponseKeys {
 
-    COUNT("Batch Record Count"),
-    DEPOSIT("Batch Net Deposit"),
-    CODE("Batch Response Code"),
-    NUMBER("Batch Number"),
-    TEXT("Batch Response Text");
-
-    private String key;
-
-    SettleResponseKeys(String key) {
-        this.key = key;
-    }
+    Batch_Record_Count,
+    Batch_Net_Deposit,
+    Batch_Response_Code,
+    Batch_Number,
+    Batch_Response_Text;
 
     public String key() {
-        return this.key;
+        return(this.name().replace("_"," "));
     }
 }
