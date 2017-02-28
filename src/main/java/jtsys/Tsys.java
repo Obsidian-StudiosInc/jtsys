@@ -57,18 +57,6 @@ public class Tsys {
         707,                                                // 707=MST
         708,                                                // 708=PST
     };
-    private final String[] AUTH_RESPONSE_KEYS = {
-        "ACI",
-        "Auth Source Code",
-        "Response Code",
-        "Approval Code",
-        "Auth Response Text",
-        "AVS Result Code",
-        "Retrieval Reference Num",
-        "Transaction Identifier",
-        "Validation Code",
-        "Group III Version Number"
-    };
     private final String[] ERROR_RESPONSE_KEYS = {
         "Code",
         "Text"
@@ -208,10 +196,11 @@ public class Tsys {
         Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
         Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
         Matcher error = Pattern.compile(error_pattern).matcher(response);
-        if(auth.matches())
-            for(int i=0;i<AUTH_RESPONSE_KEYS.length;i++)
-                map.put(AUTH_RESPONSE_KEYS[i],auth.group(i+1));
-        else if(settle.matches())
+        if(auth.matches()) {
+            AuthResponseKeys[] values = AuthResponseKeys.values();
+            for(int i=0;i<values.length;i++)
+                map.put(values[i].key(),auth.group(i+1));
+        } else if(settle.matches())
             for(int i=0;i<SETTLE_RESPONSE_KEYS.length;i++)
                 map.put(SETTLE_RESPONSE_KEYS[i],settle.group(i+1));
         else if(error.matches())
