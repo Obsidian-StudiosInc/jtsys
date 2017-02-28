@@ -83,12 +83,6 @@ public class Tsys {
         this.debug = debug;
     }
 
-    public static void main(String[] args) {
-//        System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_CBC_SHA256");
-        Tsys tsys = new Tsys();
-        tsys.authTest();
-    }
-
     private HttpsURLConnection getHttpsConnection() throws IOException {
         URL url = new URL(TSYS_URL);
         HttpsURLConnection httpsCon = (HttpsURLConnection)url.openConnection();
@@ -99,53 +93,6 @@ public class Tsys {
         return(httpsCon);
     }
 
-    private static Merchant testMerchant() {
-        Merchant m = new Merchant();
-        m.setId("999999999911");
-        m.setBin("999995");
-        m.setAgent("000000");
-        m.setChain("000000");
-        m.setStore("0011");
-        m.setTerminal("9911");
-        m.setMcc("5999");
-        m.setIndustryCode('D');
-        m.setName("Internet Service Provider");
-        m.setCity("Gloucester");
-        m.setState("VA");
-        m.setZip("543211420");
-        m.setPhone("800-1234567");
-        m.setV("00000001");
-        return(m);
-    }
-
-    private void authTest() {
-        try {
-            String r = authRequest(testMerchant(),
-                                   "0001",
-                                   "4012888888881881",
-                                   "0218",
-                                   "8320",
-                                   "85284",
-                                   "1.00");
-            LinkedHashMap<String,String> a = submit(r,MIME[0]);
-            if(a.size()==2) {
-                    System.out.print("Error :\n");
-                a.forEach((k,v) -> {
-                    System.out.printf("\t%s : %s\n",k,v);
-                });
-                System.out.print("\n");
-            } else {
-                System.out.print("Auth response :\n");
-                a.forEach((k,v) -> {
-                    System.out.printf("\t%-25s : %s\n",k,v);
-                });
-                System.out.print("\n");
-            }
-        } catch(Exception e) {
-            System.out.println(e);
-        }
-    }
-
     public String separator(String obj,
                             String s,
                             int length,
@@ -153,13 +100,6 @@ public class Tsys {
         if(s.length()!=length)
             throw new Exception(obj+" length is "+s.length()+" and should be "+length);
         return (STX+s+etbx+lrc(s+etbx));
-    }
-
-    private String testRequest() throws Exception {
-        String t = "D4.999995";   // D2. DO
-        StringBuilder msg = new StringBuilder(); 
-        msg.append(separator("test",t,t.length(),ETX));
-        return(msg.toString());
     }
 
     private LinkedHashMap<String,String> submit(String request,
