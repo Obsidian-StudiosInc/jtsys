@@ -130,11 +130,11 @@ public class Tsys {
         if(auth.matches()) {
             AuthResponseKeys[] values = AuthResponseKeys.values();
             for(int i=0;i<values.length;i++)
-                map.put(values[i].key(),auth.group(i+1));
+                map.put(values[i].key(),auth.group(i+1).trim());
         } else if(settle.matches()) {
             SettleResponseKeys[] values = SettleResponseKeys.values();
             for(int i=0;i<values.length;i++)
-                map.put(values[i].key(),settle.group(i+1));
+                map.put(values[i].key(),settle.group(i+1).trim());
         } else if(error.matches())
             for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
                 map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
