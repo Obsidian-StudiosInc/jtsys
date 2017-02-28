@@ -58,6 +58,8 @@ public class Tsys {
         708,                                                // 708=PST
     };
     private final String[] AUTH_RESPONSE_KEYS = {
+        "ACI",
+        "Auth Source Code",
         "Response Code",
         "Approval Code",
         "Auth Response Text",
@@ -307,16 +309,18 @@ public class Tsys {
     /**
      * Auth (1080) Response RegEx
      * D-Format Credit Card Authorization Response Message RegEx
-     * 
-     * Group 1. 2    A/N Response Code XX  4.71
-     * Group 2. 6    A/N Approval Code 4.8
-     * Group 3. 16   A/N Auth Response Text  4.11
-     * Group 4. 1    A/N AVS Result Code 4.3
-     * Group 5. 12   A/N Retrieval Reference Num 4.72
-     * Group 6. 0-15 A/N Transaction Identifier 4.91
-     * Group 7. 0-4  A/N Validation Code 4.96
-     * Group 8. 3    NUM Group III Version Number 4.44
-     * 
+     *
+     * Group 1.  1    A/N Returned ACI 4.73
+     * Group 2.  13   A/N Authorization Source Code 4.12
+     * Group 3.  2    A/N Response Code XX  4.71
+     * Group 4.  6    A/N Approval Code 4.8
+     * Group 5.  16   A/N Auth Response Text  4.11
+     * Group 6.  1    A/N AVS Result Code 4.3
+     * Group 7.  12   A/N Retrieval Reference Num 4.72
+     * Group 8.  0-15 A/N Transaction Identifier 4.91
+     * Group 9.  0-4  A/N Validation Code 4.96
+     * Group 10. 3    NUM Group III Version Number 4.44
+     *
      * @return String containing regex pattern to parse auth response regex
      */
     private String authResponseRexEx() {
@@ -329,10 +333,10 @@ public class Tsys {
                                                 //                                2=Multiple Transaction
                                                 //                                4=Interleaved
         r.append("\\.");                        // 3     1    Message Delimiter 4.63
-        r.append("[A-Z ]");                     // 4     1    Returned ACI 4.73
+        r.append("([A-Z ])");                   // 4     1    Returned ACI 4.73
         r.append("[0-9 ]{4}");                  // 5-8   4    NUM Store Number 4.82
         r.append("[0-9 ]{4}");                  // 9-12  4    NUM Terminal Number 4.85
-        r.append("[0-9]");                      // 13    1    Authorization Source Code 4.12
+        r.append("([0-9])");                    // 13    1    Authorization Source Code 4.12
         r.append("[0-9 ]{4}");                  // 14-17 4    NUM Transaction Sequence Num 4.92
         r.append("([0-9]{2})");                 // 18-19 2    Response Code XX  4.71
         r.append("([0-9A-Za-z ]{6})");          // 20-25 6    Approval Code 4.8
