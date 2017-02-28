@@ -450,7 +450,7 @@ public class Tsys {
         // From auth
         if(avsCode==null || avsCode.isEmpty())
             throw new Exception("Address Verification Result Code missing");
-        d.append(authSourceCode);                           // 61  1 A/N AVS Result Code (4.3)
+        d.append(avsCode);                           // 61  1 A/N AVS Result Code (4.3)
         if(transId==null || transId.isEmpty())
             transId = "000000000000000";
         d.append(String.format("%-15s",transId));           // 62-76 15 A/N Transaction Identifier Left-Justified/Space-Filled (4.206)
