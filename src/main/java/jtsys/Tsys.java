@@ -205,7 +205,7 @@ public class Tsys {
         if(DEBUG)
             System.out.printf("Cipher       : %s\n"
                             + "IP           : %s\n"
-                            + "Request      : %s\n\n"
+                            + "Request      : %s\n"
                             + "Response     : %s\n\n",
                               cipher,
                               InetAddress.getByName(httpsCon.getURL().getHost()).getHostAddress(),
