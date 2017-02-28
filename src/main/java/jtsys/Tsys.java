@@ -214,6 +214,41 @@ public class Tsys {
         return(map);
     }
 
+    /**
+     * Authorize a credit card
+     *
+     * @param merchant Merchant account to use
+     * @param transSequenceNumber 
+     * @param cardNumber Credit card number
+     * @param expiration Credit card expiration
+     * @param address Credit card holder address
+     * @param zip Credit card holder zip code
+     * @param amount Amount of charge to be authorized
+     * @return LinkedHashMap<String,String> containing credit card
+     *                                      authorization or error response
+     *                                      if length is 2, there was an error
+     *                                      otherwise use AuthResponseKeys enum
+     *                                      for key names to access values
+     * @throws Exception if any errors occur, request not proper length, issue
+     *                   with connection, etc.
+     */
+    public LinkedHashMap<String,String> auth(Merchant merchant,
+                                             String transSequenceNumber,
+                                             String cardNumber,
+                                             String expiration,
+                                             String address,
+                                             String zip,
+                                             String amount) throws Exception {
+        String r = authRequest(merchant,
+                               transSequenceNumber,
+                               cardNumber,
+                               expiration,
+                               address,
+                               zip,
+                               amount);
+        return(submit(r,MIME[0]));
+    }
+    
     private String authRequest(Merchant merchant,
                                String transSequenceNumber,
                                String cardNumber,
