@@ -211,12 +211,16 @@ public class Tsys {
             String response = new String(removeParity(result.toByteArray()));
             String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
             Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
+            Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
             Matcher error = Pattern.compile(error_pattern).matcher(response);
             if(auth.matches()) {
-                for(int i=0;1<AUTH_RESPONSE_KEYS.length;i++)
+                for(int i=0;i<AUTH_RESPONSE_KEYS.length;i++)
                     map.put(AUTH_RESPONSE_KEYS[i],auth.group(i+1));
+            } else if(settle.matches()) {
+                for(int i=0;i<SETTLE_RESPONSE_KEYS.length;i++)
+                    map.put(SETTLE_RESPONSE_KEYS[i],settle.group(i+1));
             } else if(error.matches()) {
-                for(int i=0;1<ERROR_RESPONSE_KEYS.length;i++)
+                for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
                     map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
             } else
                 System.out.printf("\nUnmatched response : %s \n\n",response);
