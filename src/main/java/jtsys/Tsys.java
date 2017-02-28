@@ -61,13 +61,6 @@ public class Tsys {
         "Code",
         "Text"
     };
-    private final String[] SETTLE_RESPONSE_KEYS = {
-        "Batch Record Count",
-        "Batch Net Deposit",
-        "Batch Response Code",
-        "Batch Number",
-        "Batch Response Text"
-    };
     private final String[] MIME = {
         "x-Visa-II/x-auth",                                 // Auth mime
         "x-Visa-II/x-settle"                                // Settle mime
@@ -200,10 +193,11 @@ public class Tsys {
             AuthResponseKeys[] values = AuthResponseKeys.values();
             for(int i=0;i<values.length;i++)
                 map.put(values[i].key(),auth.group(i+1));
-        } else if(settle.matches())
-            for(int i=0;i<SETTLE_RESPONSE_KEYS.length;i++)
-                map.put(SETTLE_RESPONSE_KEYS[i],settle.group(i+1));
-        else if(error.matches())
+        } else if(settle.matches()) {
+            SettleResponseKeys[] values = SettleResponseKeys.values();
+            for(int i=0;i<values.length;i++)
+                map.put(values[i].key(),settle.group(i+1));
+        } else if(error.matches())
             for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
                 map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
         else
