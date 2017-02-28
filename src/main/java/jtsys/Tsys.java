@@ -446,7 +446,7 @@ public class Tsys {
         d.append(responseCode);                             // 43-44 2 A/N Response Code (4.164)
         d.append(String.format("%-6s",authCode));           // 45-50 6 A/N Authorization Code Left-Justified/Space-Filled (4.12)
         d.append(new SimpleDateFormat("MMdd").format(date)); // 51-54 4 NUM Local Transaction Date MMDD (4.113)
-        d.append(new SimpleDateFormat("HHMMSS").format(date)); // 55-60 6 NUM Local Transaction Time HHMMSS (4.114)
+        d.append(new SimpleDateFormat("hhmmss").format(date)); // 55-60 6 NUM Local Transaction Time HHMMSS (4.114)
         // From auth
         if(avsCode==null || avsCode.isEmpty())
             throw new Exception("Address Verification Result Code missing");
