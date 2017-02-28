@@ -184,53 +184,50 @@ public class Tsys {
     }
 
     private LinkedHashMap<String,String> submit(String request,
-                                                String mime) {
+                                                String mime) throws IOException,
+                                                                    Exception {
         LinkedHashMap<String,String> map = null;
-        try {
-            HttpsURLConnection httpsCon = getHttpsConnection();
-            httpsCon.setRequestProperty("Content-Type", mime);
-            httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
-            System.out.printf("\nRequest :\n\t%s\n\n",
-                              request);
-            DataOutputStream wr = new DataOutputStream(httpsCon.getOutputStream());
-            wr.write(getEvenParity(request));
-            wr.flush();
-            System.out.printf("Cipher                   : %s\n"
-                             +"IP                       : %s\n",
-                              httpsCon.getCipherSuite(),
-                              InetAddress.getByName(httpsCon.getURL().getHost()).getHostAddress());
-            InputStream is = httpsCon.getInputStream();
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) != -1)
-                result.write(buffer, 0, length);
-            is.close();
-            httpsCon.disconnect();
-            map = new LinkedHashMap<String,String>();
-            String response = new String(removeParity(result.toByteArray()));
-            String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
-            Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
-            Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
-            Matcher error = Pattern.compile(error_pattern).matcher(response);
-            if(auth.matches()) {
-                for(int i=0;i<AUTH_RESPONSE_KEYS.length;i++)
-                    map.put(AUTH_RESPONSE_KEYS[i],auth.group(i+1));
-            } else if(settle.matches()) {
-                for(int i=0;i<SETTLE_RESPONSE_KEYS.length;i++)
-                    map.put(SETTLE_RESPONSE_KEYS[i],settle.group(i+1));
-            } else if(error.matches()) {
-                for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
-                    map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
-            } else
-                System.out.printf("\nUnmatched response : %s \n\n",response);
-            if(DEBUG)
-                System.out.printf("\nFull : %s \n\n",response);
-        } catch(IOException ioe) {
-            System.out.println(ioe);
-        } catch(Exception e) {
-            System.out.println(e);
-        }
+        HttpsURLConnection httpsCon = getHttpsConnection();
+        httpsCon.setRequestProperty("Content-Type", mime);
+        httpsCon.setRequestProperty("Content-Length", String.valueOf(request.length()));
+        DataOutputStream wr = new DataOutputStream(httpsCon.getOutputStream());
+        wr.write(getEvenParity(request));
+        wr.flush();
+        String cipher = httpsCon.getCipherSuite();
+        InputStream is = httpsCon.getInputStream();
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = is.read(buffer)) != -1)
+            result.write(buffer, 0, length);
+        is.close();
+        httpsCon.disconnect();
+        map = new LinkedHashMap<String,String>();
+        String response = new String(removeParity(result.toByteArray()));
+        String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
+        Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
+        Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
+        Matcher error = Pattern.compile(error_pattern).matcher(response);
+        if(auth.matches())
+            for(int i=0;i<AUTH_RESPONSE_KEYS.length;i++)
+                map.put(AUTH_RESPONSE_KEYS[i],auth.group(i+1));
+        else if(settle.matches())
+            for(int i=0;i<SETTLE_RESPONSE_KEYS.length;i++)
+                map.put(SETTLE_RESPONSE_KEYS[i],settle.group(i+1));
+        else if(error.matches())
+            for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
+                map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
+        else
+            System.out.printf("\nUn-matched response : %s \n\n",response);
+        if(DEBUG)
+            System.out.printf("Cipher       : %s\n"
+                            + "IP           : %s\n"
+                            + "Request      : %s\n\n"
+                            + "Response     : %s\n\n",
+                              cipher,
+                              InetAddress.getByName(httpsCon.getURL().getHost()).getHostAddress(),
+                              request,
+                              response);
         return(map);
     }
 
