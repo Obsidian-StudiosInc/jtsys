@@ -67,22 +67,6 @@ public class Tsys {
     };
     private final String[] LANGUAGES = { "00" };      // 00=English
  
-    private final String[] ERROR_TYPES= {
-        "B","Blocked Terminal",
-        "C","Card Type Error",
-        "D","Device Error",
-        "E","Error in Batch",
-        "S","Sequence Error",
-        "T","Transmission Error",
-        "U","Unknown Error",
-        "V","Routing Error"
-    };
-    private final String[] ERROR_RECORD_TYPES= {
-        "H","Header Record",
-        "P","Parameter Record",
-        "D","Detail Record",
-        "T","Trailer Record"
-    };
     private final static String TSYS_URL = "https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact";
 
     public static void main(String[] args) {
@@ -183,7 +167,7 @@ public class Tsys {
             result.write(buffer, 0, length);
         is.close();
         httpsCon.disconnect();
-        map = new LinkedHashMap<String,String>();
+        map = new LinkedHashMap<>();
         String response = new String(removeParity(result.toByteArray()));
         String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
         Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
