@@ -28,7 +28,6 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class Tsys {
 
-    private boolean DEBUG = true;
     private final char STX = 0x02;//0b1100100
     private final char ETX = 0x03;//0b0000011
     private final char FS  = 0x1c;//0b0011100
@@ -68,6 +67,21 @@ public class Tsys {
     private final String[] LANGUAGES = { "00" };      // 00=English
  
     private final static String TSYS_URL = "https://ssl1.tsysacquiring.net/scripts/gateway.dll?transact";
+
+    private boolean debug = false;
+
+    /**
+     * Empty constructor required to have one without parameters
+     */
+    public Tsys() {}
+
+    /**
+     * Constructor to set debugging
+     * @param debug boolean to enable debugging, true to enable, default false
+     */
+    public Tsys(boolean debug) {
+        this.debug = debug;
+    }
 
     public static void main(String[] args) {
 //        System.setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_128_CBC_SHA256");
@@ -186,7 +200,7 @@ public class Tsys {
                 map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
         else
             System.out.printf("\nUn-matched response : %s \n\n",response);
-        if(DEBUG)
+        if(debug)
             System.out.printf("Cipher       : %s\n"
                             + "IP           : %s\n"
                             + "Request      : %s\n"
