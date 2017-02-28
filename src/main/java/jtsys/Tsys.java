@@ -361,15 +361,16 @@ public class Tsys {
     private String settleRequest(Merchant merchant,
                                  String cardNumber,
                                  String transSequenceNumber,
+                                 String batchNumber,
                                  String aci,
                                  String authSourceCode,
+                                 String responseCode,
                                  String authCode,
                                  String avsCode,
                                  String transId,
                                  String validationCode,
                                  String amount,
-                                 String purchaseId,
-                                 String batchNumber) throws Exception {
+                                 String purchaseId) throws Exception {
         /* K-Format Header Record (Base Group)
          * Byte Length Frmt Field description Content Section
          * Byte Length Field: Content (section)
@@ -392,7 +393,7 @@ public class Tsys {
         h.append(TIME_ZONES[0]);                            // 55-57 3  NUM Time Zone Differential (4.200)
         Date date = new Date();
         h.append(new SimpleDateFormat("MMdd").format(date)); // 58-61 4  NUM Batch Transmission Date MMDD (4.22)
-        h.append("batchnum");                               // 62-64 3  NUM Batch Number 001 - 999 (4.18)
+        h.append(batchNumber);                              // 62-64 3  NUM Batch Number 001 - 999 (4.18)
         h.append('0');                                      // 65    1  NUM Blocking Indicator 0=Not Blocked (4.23)
 
         StringBuilder msg = new StringBuilder();
@@ -442,8 +443,7 @@ public class Tsys {
         if(transSequenceNumber==null || transSequenceNumber.isEmpty())
             throw new Exception("Transaction Sequence Number missing");
         d.append(String.format("%4s",transSequenceNumber).replace(" ","0")); // 39-42 4 NUM Transaction Sequence Number Right-Justified/Zero-Filled (4.207)
-// ###FIXME (from auth)*** 
-        d.append("00");                                     // 43-44 2 A/N Response Code (4.164)
+        d.append(responseCode);                             // 43-44 2 A/N Response Code (4.164)
         d.append(String.format("%-6s",authCode));           // 45-50 6 A/N Authorization Code Left-Justified/Space-Filled (4.12)
         d.append(new SimpleDateFormat("MMdd").format(date)); // 51-54 4 NUM Local Transaction Date MMDD (4.113)
         d.append(new SimpleDateFormat("HHMMSS").format(date)); // 55-60 6 NUM Local Transaction Time HHMMSS (4.114)
