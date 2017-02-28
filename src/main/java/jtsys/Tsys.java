@@ -126,6 +126,7 @@ public class Tsys {
         String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
         Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
         Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
+        Matcher reject = Pattern.compile(settleResponseErrorRexEx()).matcher(response);
         Matcher error = Pattern.compile(error_pattern).matcher(response);
         if(auth.matches()) {
             AuthResponseKeys[] values = AuthResponseKeys.values();
@@ -135,6 +136,22 @@ public class Tsys {
             SettleResponseKeys[] values = SettleResponseKeys.values();
             for(int i=0;i<values.length;i++)
                 map.put(values[i].key(),settle.group(i+1).trim());
+        } else if(reject.matches()) {
+            SettleResponseErrorKeys[] values = SettleResponseErrorKeys.values();
+            for(int i=0;i<values.length;i++) {
+                String name = values[i].name().replace("_"," ");
+                if(reject.group(i+1).length()==1)
+                    if(values[i].name().equals(SettleResponseErrorKeys.Error_Type.name()))
+                        for(SettleErrorTypes t: SettleErrorTypes.values())
+                            if(t.name().equals(reject.group(i+1)))
+                                map.put(name,t.value());
+                    else if(values[i].name().equals(SettleResponseErrorKeys.Error_Record_Type.name()))
+                        for(SettleErrorRecordTypes r: SettleErrorRecordTypes.values())
+                            if(r.name().equals(reject.group(i+1)))
+                                map.put(name,r.value());
+                else
+                    map.put(name,reject.group(i+1).trim());
+            }
         } else if(error.matches())
             for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
                 map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
@@ -505,7 +522,7 @@ public class Tsys {
                                                             // 5-9  5 A/N Record Type T@@@@ (4.155)
         t.append(new SimpleDateFormat("MMdd").format(date)); // 10-13  4 NUM Batch Transmission Date MMDD (4.22)
         t.append(my_batchNumber);                           // 14-16  3 NUM Batch Number 001 - 999 (4.18)
-        t.append(String.format("%9.9s","1").replace(" ","0")); // 17-25  9 NUM Batch Record Count Right-Justified/Zero-Filled (4.19)
+        t.append(String.format("%9.9s","4").replace(" ","0")); // 17-25  9 NUM Batch Record Count Right-Justified/Zero-Filled (4.19)
         my_amount = String.format("%16.16s",my_amount).replace(" ","0");
         t.append(my_amount);                                // 26-41 16 NUM Batch Hashing Total Purchases + Returns (4.16)
         t.append("0000000000000000");                       // 42-57 16 NUM Cashback Total (4.38)
@@ -589,7 +606,6 @@ public class Tsys {
         r.append("([0-9]{4})");                 // 43-46 4    Error Record Sequence Number 4.69
         r.append("([A-Z])");                    // 47    1    Error Record Type 4.70
         r.append("([0-9]{2})");                 // 48-49 2    Error Data Field Number 4.68
-        r.append("(.{32})");                    // 50-81 32   Error Data 4.67
         r.append("(.*)");
         return(r.toString());
     }
