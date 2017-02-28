@@ -381,6 +381,61 @@ public class Tsys {
         return(r.toString());
     }
 
+    /**
+     * Settle a credit card authorization (single card batch)
+     *
+     * Only supports single card settlements not batch settlements
+     *
+     * @param merchant Merchant account to use
+     * @param cardNumber Credit card number
+     * @param transSequenceNumber Transaction Sequence Num
+     * @param batchNumber Merchant specific batch number
+     * @param aci Returned ACI 4.73
+     * @param authSourceCode Authorization Source Code 4.12
+     * @param responseCode Response Code
+     * @param authCode Approval Code
+     * @param avsCode AVS Result Code 4.3
+     * @param transId Transaction Identifier 4.91
+     * @param validationCode Validation Code 4.96
+     * @param amount Amount of charge to be authorized
+     * @param purchaseId Invoice number
+     * @return LinkedHashMap<String,String> containing batch response status
+     *                                      or error response if length is 2,
+     *                                      there was an error otherwise use 
+     *                                      AuthSettleKeys enum for key names
+     *                                      to access values
+     * @throws Exception if any errors occur, request not proper length, issue
+     *                   with connection, etc.
+     */
+    public LinkedHashMap<String,String> settle(Merchant merchant,
+                                               String cardNumber,
+                                               String transSequenceNumber,
+                                               String batchNumber,
+                                               String aci,
+                                               String authSourceCode,
+                                               String responseCode,
+                                               String authCode,
+                                               String avsCode,
+                                               String transId,
+                                               String validationCode,
+                                               String amount,
+                                               String purchaseId)  
+                                                        throws Exception {
+    String r = settleRequest(merchant,
+                             cardNumber,
+                             transSequenceNumber,
+                             batchNumber,
+                             aci,
+                             authSourceCode,
+                             responseCode,
+                             authCode,
+                             avsCode,
+                             transId,
+                             validationCode,
+                             amount,
+                             purchaseId);
+        return(submit(r,MIME[1]));
+    }
     /* K 1081 Settle
         
     */
