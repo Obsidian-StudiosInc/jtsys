@@ -126,6 +126,7 @@ public class Tsys {
         String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
         Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
         Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
+        Matcher duplicate = Pattern.compile(settleResponseDupRexEx()).matcher(response);
         Matcher reject = Pattern.compile(settleResponseRejectRexEx()).matcher(response);
         Matcher error = Pattern.compile(error_pattern).matcher(response);
         if(auth.matches()) {
@@ -136,6 +137,11 @@ public class Tsys {
             SettleResponseKeys[] values = SettleResponseKeys.values();
             for(int i=0;i<values.length;i++)
                 map.put(values[i].key(),settle.group(i+1).trim());
+        } else if(duplicate.matches()) {
+            SettleResponseKeys[] values = SettleResponseKeys.values();
+            for(int i=0;i<values.length-1;i++)
+                map.put(values[i].key(),duplicate.group(i+1).trim());
+            map.put("Batch Date",duplicate.group(values.length));
         } else if(reject.matches()) {
             SettleResponseErrorKeys[] values = SettleResponseErrorKeys.values();
             for(int i=0;i<values.length;i++) {
@@ -557,6 +563,7 @@ public class Tsys {
         r.append("([0-9]{3})");                 // 39-41 3    Batch Number 999 4.18
         return(r.toString());
     }
+
     /**
      * Settle (1081) Response RegEx
      * K-Format Trailer “GB” (Good Batch)  Response Record RegEx
@@ -576,6 +583,28 @@ public class Tsys {
         r.append("([ _A-Z0-9]{9})");            // 42-50 9    Batch Response Text _ACCEPTED 4.21
         r.append("[ 0-9]{16}");                 // 51-66 16   Filler Spaces 4.78
         r.append("(.*)");
+        return(r.toString());
+    }
+
+    /**
+     * Settle (1081) Response Duplicate Batch RegEx
+     * K-Format Trailer "QD" (Duplicate Batch) Response Record RegEx
+     *
+     * Group 1.  9    Batch Record Count Right-Justified/Zero-Filled 4.19
+     * Group 2.  16   Batch Net Deposit Right-Justified/Zero-Filled 4.17
+     * Group 3.  2    Batch Response Code RB 4.20
+     * Group 4.  3    Batch Number 999 4.18
+     * Group 5.  4    Batch Transmission Date MMDD 4.22
+     *
+     * @return String containing regex pattern to parse settle response regex
+     */
+    private String settleResponseDupRexEx() {
+        // K-Format Trailer “QD” Response Record
+        StringBuilder r = new StringBuilder();
+        r.append(settleResponseRexExCommon("QD"));
+        r.append("([0-9]{4})");                 // 42-45 4    Batch Transmission Date MMDD 4.22
+        r.append("[ ]{21}");                    // 46-66 21   Filler Spaces 4.79
+        r.append(".*");
         return(r.toString());
     }
 
