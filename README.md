@@ -8,7 +8,7 @@ settling credit card transations. Presently only supporting Sierra
 platform using Visa "K" 1080/1081 formats.
 
 ## Usage
-Instructions on usage will come. This is still in early development, so 
+Instructions on usage will come. This is still in early development, 
 usage could change drastically. Thus no tags or releases yet. The 
 basics, build using gradle or javac. To use call auth or settle after 
 auth. Then  parse the returned LinkedHashMap.
