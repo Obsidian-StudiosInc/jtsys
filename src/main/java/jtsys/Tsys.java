@@ -542,7 +542,7 @@ public class Tsys {
      *
      * @return String containing regex pattern to parse settle response regex
      */
-    private String settleResponseRexExCommon() {
+    private String settleResponseRexExCommon(String code) {
         StringBuilder r = new StringBuilder();
         r.append(STX);
         r.append('K');                          // 1     1    Record Format K 4.154
@@ -552,6 +552,9 @@ public class Tsys {
         r.append("R@@@@");                      // 5-9   5    Record Type R@@@@ 4.155
         r.append("([0-9]{9})");                 // 10-18 9    Batch Record Count Right-Justified/Zero-Filled 4.19
         r.append("([0-9]{16})");                // 19-34 16   Batch Net Deposit Right-Justified/Zero-Filled 4.17
+        r.append(code);                         // 35-36 2    Batch Response Code ( GB, QD, RB ) 4.20
+        r.append("00");                         // 37-38 2    Filler 00 4.79
+        r.append("([0-9]{3})");                 // 39-41 3    Batch Number 999 4.18
         return(r.toString());
     }
     /**
@@ -569,10 +572,7 @@ public class Tsys {
     private String settleResponseRexEx() {
         // K-Format Trailer “GB” Response Record
         StringBuilder r = new StringBuilder();
-        r.append(settleResponseRexExCommon());
-        r.append("GB");                         // 35-36 2    Batch Response Code GB 4.20
-        r.append("00");                         // 37-38 2    Filler 00 4.79
-        r.append("([0-9]{3})");                 // 39-41 3    Batch Number 999 4.18
+        r.append(settleResponseRexExCommon("GB"));
         r.append("([ _A-Z0-9]{9})");            // 42-50 9    Batch Response Text _ACCEPTED 4.21
         r.append("[ 0-9]{16}");                 // 51-66 16   Filler Spaces 4.78
         r.append("(.*)");
@@ -598,10 +598,7 @@ public class Tsys {
     private String settleResponseRejectRexEx() {
         // K-Format Trailer “RB” Response Record
         StringBuilder r = new StringBuilder();
-        r.append(settleResponseRexExCommon());
-        r.append("RB");                         // 35-36 2    Batch Response Code RB 4.20
-        r.append("00");                         // 37-38 2    Filler 00 4.79
-        r.append("([0-9]{3})");                 // 39-41 3    Batch Number 999 4.18
+        r.append(settleResponseRexExCommon("RB"));
         r.append("([A-Z])");                    // 42    1    Error Type 4.71
         r.append("([0-9]{4})");                 // 43-46 4    Error Record Sequence Number 4.69
         r.append("([A-Z])");                    // 47    1    Error Record Type 4.70
