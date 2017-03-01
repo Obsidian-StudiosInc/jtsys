@@ -1,4 +1,7 @@
-# jtsys - Java library interface to Tsys merchant processor
+# jtsys
+[![License](http://img.shields.io/badge/license-GPLv3-9977bb.svg?style=plastic)](https://github.com/Obsidian-StudiosInc/jem/blob/master/LICENSE)
+[![Build Status](https://img.shields.io/travis/Obsidian-StudiosInc/jtsys/master.svg?colorA=9977bb&style=plastic)](https://travis-ci.org/Obsidian-StudiosInc/jtsys)
+[![Build Status](https://img.shields.io/shippable/58b6492eddd8e80700462c3b/master.svg?colorA=9977bb&style=plastic)](https://app.shippable.com/projects/58b6492eddd8e80700462c3b/)
 
 A java library interface to Tsys merchant processor for processing and 
 settling credit card transations. Presently only supporting Sierra 
@@ -25,3 +28,4 @@ countries. All other products and company names are trademarks of their
 respective companies.
 
 Usage is subject to Tsys merchant terms and conditions.
+
