@@ -13,7 +13,6 @@ public enum SettleResponseKeys {
 
     Batch_Record_Count,
     Batch_Net_Deposit,
-    Batch_Response_Code,
     Batch_Number,
     Batch_Response_Text;
 
