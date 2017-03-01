@@ -126,7 +126,7 @@ public class Tsys {
         String error_pattern = "^(\\d+)\\s+\\-\\s+(\\S.*)$";            // Error Pattern
         Matcher auth = Pattern.compile(authResponseRexEx()).matcher(response);
         Matcher settle = Pattern.compile(settleResponseRexEx()).matcher(response);
-        Matcher reject = Pattern.compile(settleResponseErrorRexEx()).matcher(response);
+        Matcher reject = Pattern.compile(settleResponseRejectRexEx()).matcher(response);
         Matcher error = Pattern.compile(error_pattern).matcher(response);
         if(auth.matches()) {
             AuthResponseKeys[] values = AuthResponseKeys.values();
@@ -580,7 +580,7 @@ public class Tsys {
     }
 
     /**
-     * Settle (1081) Response RegEx
+     * Settle (1081) Response Reject Batch RegEx
      * K-Format Trailer "RB" (Rejected Batch) Response Record RegEx
      *
      * Group 1.  9    Batch Record Count Right-Justified/Zero-Filled 4.19
@@ -595,7 +595,7 @@ public class Tsys {
      *
      * @return String containing regex pattern to parse settle response regex
      */
-    private String settleResponseErrorRexEx() {
+    private String settleResponseRejectRexEx() {
         // K-Format Trailer “RB” Response Record
         StringBuilder r = new StringBuilder();
         r.append(settleResponseRexExCommon());
