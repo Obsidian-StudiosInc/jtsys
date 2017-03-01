@@ -1,0 +1,9 @@
+jtsys THANKS file
+
+jtsys was initially written by William L. Thomson Jr. jtsys is losely 
+based on a perl module called Business::OnlinePayment::VirtualNet. 
+Thanks goes to all authors of and contributors to VirtualNet.pm for 
+which jtsys is losely based.
+
+  - Ivan Kohler <ivan-virtualnet@420.am>
+    http://search.cpan.org/~ivan/Business-OnlinePayment-VirtualNet-0.02/VirtualNet.pm
