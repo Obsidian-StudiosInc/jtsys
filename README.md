@@ -18,8 +18,8 @@ Requires a valid TSYS merchant account for the Sierra (aka Vital) platform.
 Visit [TSYS Merchant Solutions](http://tsysmerchantsolutions.com/) for 
 more information on TSYS Merchant Solutions.
 
-## PCI-DSS Certification
-This libary is not PCI-DSS certified. That is a long term goal if possible.
+## PA-DSS Validation
+This libary is not PA-DSS validated. That is a long term goal if possible.
 
 ## Legal
 
