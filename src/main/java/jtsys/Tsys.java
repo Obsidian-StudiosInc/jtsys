@@ -131,8 +131,18 @@ public class Tsys {
         Matcher error = Pattern.compile(error_pattern).matcher(response);
         if(auth.matches()) {
             AuthResponseKeys[] values = AuthResponseKeys.values();
-            for(int i=0;i<values.length;i++)
-                map.put(values[i].key(),auth.group(i+1).trim());
+            int g = 0;
+            for(int i=0;i<values.length;i++) {
+                g++; // Separate iterator to skip AVS Text :/
+                map.put(values[i].key(),auth.group(g).trim());
+                if(auth.group(g).length()==1 &&
+                   values[i].name().equals(AuthResponseKeys.AVS_Result_Code.name())) {
+                    i++; // increment values to skip AVS_Result_Text
+                    for(AVSCodes c: AVSCodes.values())
+                        if(c.name().equals(auth.group(g)))
+                            map.put(values[i].key(),c.value());
+                }
+            }
         } else if(settle.matches()) {
             SettleResponseKeys[] values = SettleResponseKeys.values();
             for(int i=0;i<values.length;i++)

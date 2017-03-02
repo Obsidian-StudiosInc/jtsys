@@ -16,6 +16,7 @@ public enum AuthResponseKeys {
     Approval_Code,
     Auth_Response_Text,
     AVS_Result_Code,
+    AVS_Result_Text,
     Retrieval_Reference_Num,
     Transaction_Identifier,
     Validation_Code,
