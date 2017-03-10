@@ -374,6 +374,7 @@ public class Tsys {
      * @param validationCode Validation Code 4.96
      * @param amount Amount of charge to be authorized
      * @param purchaseId Invoice number
+     * @param voidTrans boolean indicator to void transaction, true for void
      * @return LinkedHashMap<String,String> containing batch response status
      *                                      or error response if length is 2,
      *                                      there was an error otherwise use 
@@ -394,7 +395,8 @@ public class Tsys {
                                                String transId,
                                                String validationCode,
                                                String amount,
-                                               String purchaseId)  
+                                               String purchaseId,
+                                               boolean voidTrans)  
                                                         throws Exception {
     String r = settleRequest(merchant,
                              cardNumber,
@@ -408,7 +410,8 @@ public class Tsys {
                              transId,
                              validationCode,
                              amount,
-                             purchaseId);
+                             purchaseId,
+                             voidTrans);
         return(submit(r,MIME[1]));
     }
 
@@ -430,6 +433,7 @@ public class Tsys {
      * @param validationCode Validation Code 4.96
      * @param amount Amount of charge to be authorized
      * @param purchaseId Invoice number
+     * @param voidTrans boolean indicator to void transaction, true for void
      * @return String containing a K-Format 1081 settle request 
      * @throws Exception if any errors occur, request not proper length, issue
      *                   with connection, etc.
@@ -446,7 +450,8 @@ public class Tsys {
                                  String transId,
                                  String validationCode,
                                  String amount,
-                                 String purchaseId) throws Exception {
+                                 String purchaseId,
+                                 boolean voidTrans) throws Exception {
         /* K-Format Header Record (Base Group)
          * Byte Length Frmt Field description Content Section
          * Byte Length Field: Content (section)
@@ -534,7 +539,10 @@ public class Tsys {
         if(validationCode==null || validationCode.isEmpty())
             validationCode = "    ";
         d.append(validationCode);                           // 77-80 4 A/N Validation Code (4.218)
-        d.append(' ');                                      // 81   1 A/N Void Indicator <SPACE> = Not Voided (4.224)
+        if(voidTrans)
+            d.append('V');                                  // 81   1 A/N Void Indicator <SPACE> = Not Voided (4.224)
+        else
+            d.append(' ');                                  // 81   1 A/N Void Indicator <SPACE> = Not Voided (4.224)
         d.append("00");                                     // 82-83 2 NUM Transaction Status Code 00 (4.208)
         d.append('0');                                      // 84   1 A/N Reimbursement Attribute 0 (4.157)
         
