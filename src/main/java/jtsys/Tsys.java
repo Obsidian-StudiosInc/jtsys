@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -172,16 +174,18 @@ public class Tsys {
             for(int i=0;i<ERROR_RESPONSE_KEYS.length;i++)
                 map.put(ERROR_RESPONSE_KEYS[i],error.group(i+1));
         else
-            System.out.printf("\nUn-matched response : %s \n\n",response);
+            Logger.getLogger(Tsys.class.getName()).log(Level.SEVERE,
+                    String.format("\nUn-matched response : %s \n\n",response));
         if(debug)
-            System.out.printf("Cipher       : %s\n"
+            Logger.getLogger(Tsys.class.getName()).log(Level.SEVERE,
+                String.format("Cipher       : %s\n"
                             + "IP           : %s\n"
                             + "Request      : %s\n"
                             + "Response     : %s\n\n",
                               cipher,
                               InetAddress.getByName(httpsCon.getURL().getHost()).getHostAddress(),
                               request,
-                              response);
+                              response));
         return(map);
     }
 
