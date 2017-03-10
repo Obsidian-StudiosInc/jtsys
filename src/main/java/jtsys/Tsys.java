@@ -411,9 +411,29 @@ public class Tsys {
                              purchaseId);
         return(submit(r,MIME[1]));
     }
-    /* K 1081 Settle
-        
-    */
+
+    /**
+     * Settle request contents
+     * Actual K-Format 1081 settle request contents to be transmitted
+     * via a connection
+     *
+     * @param merchant Merchant account to use
+     * @param cardNumber Credit card number
+     * @param transSequenceNumber Transaction Sequence Num
+     * @param batchNumber Merchant specific batch number
+     * @param aci Returned ACI 4.73
+     * @param authSourceCode Authorization Source Code 4.12
+     * @param responseCode Response Code
+     * @param authCode Approval Code
+     * @param avsCode AVS Result Code 4.3
+     * @param transId Transaction Identifier 4.91
+     * @param validationCode Validation Code 4.96
+     * @param amount Amount of charge to be authorized
+     * @param purchaseId Invoice number
+     * @return String containing a K-Format 1081 settle request 
+     * @throws Exception if any errors occur, request not proper length, issue
+     *                   with connection, etc.
+     */
     private String settleRequest(Merchant merchant,
                                  String cardNumber,
                                  String transSequenceNumber,
