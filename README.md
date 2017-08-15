@@ -10,10 +10,9 @@ supporting Sierra platform using Visa "K" 1080/1081 formats. The library
 does not have any external depdencies.
 
 ## Usage
-Instructions on usage will come. This is still in early development, 
-usage could change drastically. Thus no tags or releases yet. The 
-basics, build using gradle or javac. To use call auth or settle after 
-auth. Then  parse the returned LinkedHashMap.
+Instructions on usage will come. The basics, build using gradle or 
+javac. To use call auth or settle after auth. Then parse the returned 
+LinkedHashMap.
 
 Requires a valid TSYS merchant account for the Sierra (aka Vital) platform.
 Visit [TSYS Merchant Solutions](http://tsysmerchantsolutions.com/) for 
