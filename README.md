@@ -1,5 +1,5 @@
 # jtsys
-[![License](http://img.shields.io/badge/license-GPLv3-9977bb.svg?style=plastic)](https://github.com/Obsidian-StudiosInc/jem/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-GPLv3-9977bb.svg?style=plastic)](https://github.com/Obsidian-StudiosInc/jtsys/blob/master/LICENSE)
 [![Build Status](https://img.shields.io/travis/Obsidian-StudiosInc/jtsys/master.svg?colorA=9977bb&style=plastic)](https://travis-ci.org/Obsidian-StudiosInc/jtsys)
 [![Build Status](https://img.shields.io/shippable/58b6492eddd8e80700462c3b/master.svg?colorA=9977bb&style=plastic)](https://app.shippable.com/projects/58b6492eddd8e80700462c3b/)
 [![Code Quality](https://img.shields.io/coverity/scan/12327.svg?colorA=9977bb&style=plastic)](https://scan.coverity.com/projects/obsidian-studiosinc-jtsys)
