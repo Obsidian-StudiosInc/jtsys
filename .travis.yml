@@ -3,20 +3,23 @@ sudo: true
 jdk:
   - oraclejdk8
 
-env:
-  global:
-   - secure: "SmGakWJd+hX2vcFVmpNX87U5zA3SwATWtvXfDCI9lkepB3KyGc9F+5bJeYUKFt8M2PCbmxx9WAwF6QQ5sX++JA7T+gQuVgHCGyUD/heMO3ui29xsQ19Zfq0ki9N5RUV2LrJtxfvg0+I9GzJamKZjToqQ9DvpRNE8ta9/el4H/YTlQ4O9xOgtiWkis9L/e7zdJZ5w94ZC6a4w2NYJ6u6FDIA4JWvu2OHfSdMWY/qfKg+iSSP5aWQf9VhUE5uGV3itQjUCRge3Pfp56+rOHnuGD9KnlNc9QYP3hdJWyP072tNT7sjj/7e5BQUXYRkc0uIs650oCuMmrYPH5sZJKwFwwvcyB3lU1GgnqW9qGj70VTNPaT5q1eaTYS4U3BOLHcoAiDQgO8T7Z51aiT4mbFYVfDI3bKobk/hsKEna5pvgbhpJ+EqU+jeYnDLxRRUxGRRCyUIoCh2VaL8q9iDSD5NxID5H0mJ4wQgwZLtwkkIGuZJb4NPj5qNJTpC9B0qiLwMopNQUuJ4jUVbpXlMcme+oldH+kVdmUvq8d9iKNeSp05QzL2THNZGpYoVPdbuoqIFmKjlAVUyOE3DsYM/U/PDzWTe1zA4TiF9iJD4UCG5+NzCWd/wxM+44Gf88axdxHXXt8eq1XjzEtwzqq7GVE4h1GegIj0CBBGcpmpBLxkkbogM="
-
-before_install:
-      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-
-addons:
-  coverity_scan:
-    project:
-      name: "Obsidian-StudiosInc/jtsys"
-      description: "Build submitted via Travis CI"
-    notification_email: wlt@o-sinc.com
-    build_command_prepend: "gradle clean"
-    build_command: "gradle build"
-    branch_pattern: master
-
+jobs:
+  include:
+    - stage: Test Build
+    - stage: SonarQube Scan
+      script:
+        - gradle sonarqube -Dsonar.organization=obsidian-studiosinc-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9c367830b3c5f6dbc618d03acf487d3c095500a4
+    - stage: Coverity Scan
+      env:
+        - secure: "SmGakWJd+hX2vcFVmpNX87U5zA3SwATWtvXfDCI9lkepB3KyGc9F+5bJeYUKFt8M2PCbmxx9WAwF6QQ5sX++JA7T+gQuVgHCGyUD/heMO3ui29xsQ19Zfq0ki9N5RUV2LrJtxfvg0+I9GzJamKZjToqQ9DvpRNE8ta9/el4H/YTlQ4O9xOgtiWkis9L/e7zdJZ5w94ZC6a4w2NYJ6u6FDIA4JWvu2OHfSdMWY/qfKg+iSSP5aWQf9VhUE5uGV3itQjUCRge3Pfp56+rOHnuGD9KnlNc9QYP3hdJWyP072tNT7sjj/7e5BQUXYRkc0uIs650oCuMmrYPH5sZJKwFwwvcyB3lU1GgnqW9qGj70VTNPaT5q1eaTYS4U3BOLHcoAiDQgO8T7Z51aiT4mbFYVfDI3bKobk/hsKEna5pvgbhpJ+EqU+jeYnDLxRRUxGRRCyUIoCh2VaL8q9iDSD5NxID5H0mJ4wQgwZLtwkkIGuZJb4NPj5qNJTpC9B0qiLwMopNQUuJ4jUVbpXlMcme+oldH+kVdmUvq8d9iKNeSp05QzL2THNZGpYoVPdbuoqIFmKjlAVUyOE3DsYM/U/PDzWTe1zA4TiF9iJD4UCG5+NzCWd/wxM+44Gf88axdxHXXt8eq1XjzEtwzqq7GVE4h1GegIj0CBBGcpmpBLxkkbogM="
+      addons:
+        coverity_scan:
+          project:
+            name: "Obsidian-StudiosInc/jtsys"
+            description: "Build submitted via Travis CI"
+          notification_email: wlt@o-sinc.com
+          build_command_prepend: "gradle clean"
+          build_command: "gradle build"
+          branch_pattern: master
+      script:
+        - true
