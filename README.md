@@ -3,6 +3,7 @@
 [![Build Status](https://img.shields.io/travis/Obsidian-StudiosInc/jtsys/master.svg?colorA=9977bb&style=plastic)](https://travis-ci.org/Obsidian-StudiosInc/jtsys)
 [![Build Status](https://img.shields.io/shippable/58b6492eddd8e80700462c3b/master.svg?colorA=9977bb&style=plastic)](https://app.shippable.com/projects/58b6492eddd8e80700462c3b/)
 [![Code Quality](https://img.shields.io/coverity/scan/12327.svg?colorA=9977bb&style=plastic)](https://scan.coverity.com/projects/obsidian-studiosinc-jtsys)
+[![Code Quality](https://sonarcloud.io/api/project_badges/measure?project=jtsys&metric=alert_status)](https://sonarcloud.io/dashboard?id=jtsys)
 
 A 100% pure java library interface to TSYS merchant processor for 
 processing and settling credit card transations. Presently only 
