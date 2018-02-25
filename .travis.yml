@@ -7,8 +7,13 @@ jobs:
   include:
     - stage: Test Build
     - stage: SonarQube Scan
+      addons:
+        sonarcloud:
+          organization: obsidian-studiosinc-github
+          token:
+            secure: avT8QXVzEYn0L3BsnAJ+qqs0S0gBsmYVvf2HlR/facz3lggUAbjwjmxyMcFQcosqHrsLNzHYE3nqB1Btd6C4kKBVJ244ppc+nFYHkdMCZBrOoccHaixzuV/+5a2zgU7lR8NYC3Eleqd+i5GPKkWVlB6VMMZqn5OY+wV1hVYX4xjysuIs7NqmMFZlAO+TGvrsuBl9QjxmMiNqX/EC54fwPkHyUOXhkypSP6d/p2TDiUSpotqPTDD9G1o/wTC6DquOlNvrU9BsKmdgamplThk7ba5JiAXWKZGyckaCNJPadtuDJ2REY5m86wwZjIw7HL4+D2UP4L4uqQT99BMaxTjR3roEKllWr2YyLMa8dELc9u3F6uBKYsxHW2/SzNMD2QJh0Wml5Hxk7iTE8h2n2xdcKbXI7gK412cwrURDqX+IlDP7s7CJUcGqk71ZDTpvaOgCgDNZkxNLDPXpaO5Dg7BsCJf/TkPaaFqylIeegbvn04KAeh4Csdi99nGAnt/dUubviZUaILs7QVXxSgHbSFs4ncj7mU41iziXv4lQ1Wxa5uCG0oY1SunVIJ+0RUYMy6riaIwfJMszAG4kkHNc4J9uhF82SJr/FMqrNAC+fm2rTClRb/fVA3hL7IaQ3fcczkXp20nQoOTzS8F/dQfUeP2US0NPNab4FY8tqxXoMm0b8CQ=
       script:
-        - gradle sonarqube -Dsonar.organization=obsidian-studiosinc-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9c367830b3c5f6dbc618d03acf487d3c095500a4
+        - gradle sonarqube
     - stage: Coverity Scan
       env:
         - secure: "SmGakWJd+hX2vcFVmpNX87U5zA3SwATWtvXfDCI9lkepB3KyGc9F+5bJeYUKFt8M2PCbmxx9WAwF6QQ5sX++JA7T+gQuVgHCGyUD/heMO3ui29xsQ19Zfq0ki9N5RUV2LrJtxfvg0+I9GzJamKZjToqQ9DvpRNE8ta9/el4H/YTlQ4O9xOgtiWkis9L/e7zdJZ5w94ZC6a4w2NYJ6u6FDIA4JWvu2OHfSdMWY/qfKg+iSSP5aWQf9VhUE5uGV3itQjUCRge3Pfp56+rOHnuGD9KnlNc9QYP3hdJWyP072tNT7sjj/7e5BQUXYRkc0uIs650oCuMmrYPH5sZJKwFwwvcyB3lU1GgnqW9qGj70VTNPaT5q1eaTYS4U3BOLHcoAiDQgO8T7Z51aiT4mbFYVfDI3bKobk/hsKEna5pvgbhpJ+EqU+jeYnDLxRRUxGRRCyUIoCh2VaL8q9iDSD5NxID5H0mJ4wQgwZLtwkkIGuZJb4NPj5qNJTpC9B0qiLwMopNQUuJ4jUVbpXlMcme+oldH+kVdmUvq8d9iKNeSp05QzL2THNZGpYoVPdbuoqIFmKjlAVUyOE3DsYM/U/PDzWTe1zA4TiF9iJD4UCG5+NzCWd/wxM+44Gf88axdxHXXt8eq1XjzEtwzqq7GVE4h1GegIj0CBBGcpmpBLxkkbogM="
