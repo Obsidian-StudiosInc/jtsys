@@ -143,8 +143,8 @@ public class Tsys {
                     for(AVSCodes c: AVSCodes.values())
                         if(c.name().equals(auth.group(g)))
                             map.put(values[i].key(),c.value());
+                        }
                 }
-            }
         } else if(settle.matches()) {
             SettleResponseKeys[] values = SettleResponseKeys.values();
             for(int i=0;i<values.length;i++)
@@ -337,7 +337,7 @@ public class Tsys {
         r.append("([A-Z ])");                   // 4     1    Returned ACI 4.73
         r.append("[0-9 ]{4}");                  // 5-8   4    NUM Store Number 4.82
         r.append("[0-9 ]{4}");                  // 9-12  4    NUM Terminal Number 4.85
-        r.append("([0-9])");                    // 13    1    Authorization Source Code 4.12
+        r.append("(.)");                        // 13    1    Authorization Source Code 4.12
         r.append("[0-9 ]{4}");                  // 14-17 4    NUM Transaction Sequence Num 4.92
         r.append("([0-9]{2})");                 // 18-19 2    Response Code XX  4.71
         r.append("([0-9A-Za-z ]{6})");          // 20-25 6    Approval Code 4.8
